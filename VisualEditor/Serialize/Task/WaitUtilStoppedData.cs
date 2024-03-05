@@ -2,12 +2,21 @@
 
 namespace NPSerialization
 {
-    public class WaitUtilStoppedData : ActionData
+    public class WaitUtilStoppedData : NodeData
     {
+        [System.NonSerialized]
+        public WaitUntilStopped m_waitUtilStopped;
         bool sucessWhenStopped;
-        public override Task CreateTask()
+
+        public Task CreateTask()
         {
-            return m_action;
+            m_waitUtilStopped = new WaitUntilStopped(sucessWhenStopped);
+            return m_waitUtilStopped;
+        }
+
+        public override Node GetNode()
+        {
+            return m_waitUtilStopped;
         }
     }
 }

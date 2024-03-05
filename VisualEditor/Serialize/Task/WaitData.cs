@@ -2,13 +2,21 @@
 
 namespace NPSerialization
 {
-    public class WaitData : ActionData
+    public class WaitData : NodeData
     {
+        [System.NonSerialized]
+        public Wait m_wait;
         public float m_seconds;
 
-        public override Task CreateTask()
+        public Task CreateTask()
         {
-            return m_action;
+            m_wait = new Wait(m_seconds);
+            return m_wait;
+        }
+
+        public override Node GetNode()
+        {
+            return m_wait;
         }
     }
 }

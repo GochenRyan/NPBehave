@@ -1,3 +1,4 @@
+using NPBehave;
 using System.Collections.Generic;
 
 namespace NPSerialization
@@ -11,6 +12,8 @@ namespace NPSerialization
         public NodeType m_nodeType;
         public List<long> m_linkedNodeIDs = new List<long>();
         public string m_description;
+
+        public abstract Node GetNode();
     }
 }
 

@@ -7,7 +7,9 @@ namespace NPSerialization
 {
     public class ActionData : NodeData
     {
+        [System.NonSerialized]
         public Action m_action;
+
         public DelegateData m_actionData;
 
         public virtual Task CreateTask()
@@ -33,6 +35,11 @@ namespace NPSerialization
                 m_action = null;
             }
 
+            return m_action;
+        }
+
+        public override Node GetNode()
+        {
             return m_action;
         }
     }
