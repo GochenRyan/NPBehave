@@ -8,16 +8,16 @@ namespace NPSerialization
     public class DelegateData
     {
         [System.NonSerialized]
-        private Action m_action;
+        public Action m_action;
 
         [System.NonSerialized]
-        private Func<bool> m_singleFrameFunc;
+        public Func<bool> m_singleFrameFunc;
 
         [System.NonSerialized]
-        private Func<bool, Result> m_multiFrameFunc;
+        public Func<bool, Result> m_multiFrameFunc;
 
         [System.NonSerialized]
-        private Func<Request, Result> m_multiFrameFunc2;
+        public Func<Request, Result> m_multiFrameFunc2;
 
         public string ActionString
         {

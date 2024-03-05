@@ -12,6 +12,27 @@ namespace NPSerialization
 
         public virtual Task CreateTask()
         {
+            if (m_actionData.m_action != null)
+            {
+                m_action = new Action(m_actionData.m_action);
+            }
+            else if (m_actionData.m_singleFrameFunc == null)
+            {
+                m_action = new Action(m_actionData.m_singleFrameFunc);
+            }
+            else if (m_actionData.m_singleFrameFunc == null)
+            {
+                m_action = new Action(m_actionData.m_multiFrameFunc);
+            }
+            else if (m_actionData.m_singleFrameFunc == null)
+            {
+                m_action = new Action(m_actionData.m_multiFrameFunc2);
+            }
+            else
+            {
+                m_action = null;
+            }
+
             return m_action;
         }
     }
