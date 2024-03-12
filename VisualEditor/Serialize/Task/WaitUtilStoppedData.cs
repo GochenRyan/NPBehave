@@ -6,7 +6,11 @@ namespace NPSerialization
     {
         [System.NonSerialized]
         public WaitUntilStopped m_waitUtilStopped;
-        bool sucessWhenStopped;
+        public bool sucessWhenStopped = false;
+
+        public WaitUtilStoppedData(long id) : base(id)
+        {
+        }
 
         public Task CreateTask()
         {

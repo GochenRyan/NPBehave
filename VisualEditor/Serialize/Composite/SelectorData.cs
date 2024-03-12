@@ -7,6 +7,10 @@ namespace NPSerialization
         [System.NonSerialized]
         public Selector m_selector;
 
+        public SelectorData(long id) : base(id)
+        {
+        }
+
         public Composite CrateComposite(Node[] nodes)
         {
             m_selector = new Selector(nodes);

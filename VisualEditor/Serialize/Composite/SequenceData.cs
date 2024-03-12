@@ -7,7 +7,11 @@ namespace NPSerialization
         [System.NonSerialized]
         public Sequence m_sequence;
 
-        public Composite CrateComposite(Node[] nodes)
+        public SequenceData(long id) : base(id)
+        {
+        }
+
+        public Composite CreateComposite(Node[] nodes)
         {
             m_sequence = new Sequence(nodes);
             return m_sequence;

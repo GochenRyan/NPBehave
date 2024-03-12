@@ -2,7 +2,7 @@
 {
     public interface IStream
     {
-        public bool Save(string path);
-        public bool Load(string path);
+        public void Save<T>(T obj, string path);
+        public bool Load<T>(string path, out T obj);
     }
 }

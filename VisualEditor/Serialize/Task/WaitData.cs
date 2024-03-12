@@ -8,6 +8,10 @@ namespace NPSerialization
         public Wait m_wait;
         public float m_seconds;
 
+        public WaitData(long id) : base(id)
+        {
+        }
+
         public Task CreateTask()
         {
             m_wait = new Wait(m_seconds);

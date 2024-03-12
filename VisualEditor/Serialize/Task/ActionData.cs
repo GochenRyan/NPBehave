@@ -1,7 +1,4 @@
 using NPBehave;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace NPSerialization
 {
@@ -11,6 +8,10 @@ namespace NPSerialization
         public Action m_action;
 
         public DelegateData m_actionData;
+
+        public ActionData(long id) : base(id)
+        {
+        }
 
         public virtual Task CreateTask()
         {

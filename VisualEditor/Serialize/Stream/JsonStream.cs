@@ -1,15 +1,22 @@
-﻿namespace NPSerialization
+﻿using System.IO;
+using UnityEngine;
+
+namespace NPSerialization
 {
     public class JsonStream : IStream
     {
-        public bool Load(string path)
+        public bool Load<T>(string path, out T obj)
         {
-            throw new System.NotImplementedException();
+            string jsonString = File.ReadAllText(path);
+            obj = JsonUtility.FromJson<T>(jsonString);
+
+            return obj != null;
         }
 
-        public bool Save(string path)
+        public void Save<T>(T obj, string path)
         {
-            throw new System.NotImplementedException();
+            string jsonString = JsonUtility.ToJson(obj);
+            File.WriteAllText(path, jsonString);
         }
     }
 }
