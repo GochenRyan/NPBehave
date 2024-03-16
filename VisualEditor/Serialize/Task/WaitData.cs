@@ -1,10 +1,11 @@
-﻿using NPBehave;
+﻿using Newtonsoft.Json;
+using NPBehave;
 
 namespace NPSerialization
 {
     public class WaitData : NodeData
     {
-        [System.NonSerialized]
+        [JsonIgnore]
         public Wait m_wait;
         public float m_seconds;
 

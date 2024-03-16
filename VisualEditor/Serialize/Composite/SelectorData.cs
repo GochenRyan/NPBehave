@@ -1,10 +1,11 @@
-﻿using NPBehave;
+﻿using Newtonsoft.Json;
+using NPBehave;
 
 namespace NPSerialization
 {
     public class SelectorData : NodeData
     {
-        [System.NonSerialized]
+        [JsonIgnore]
         public Selector m_selector;
 
         public SelectorData(long id) : base(id)

@@ -1,13 +1,14 @@
+using Newtonsoft.Json;
 using NPBehave;
 
 namespace NPSerialization
 {
     public class ActionData : NodeData
     {
-        [System.NonSerialized]
+        [JsonIgnore]
         public Action m_action;
 
-        public DelegateData m_actionData;
+        public DelegateData m_actionData = new();
 
         public ActionData(long id) : base(id)
         {

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace NPSerialization
@@ -8,14 +9,14 @@ namespace NPSerialization
         public bool Load<T>(string path, out T obj)
         {
             string jsonString = File.ReadAllText(path);
-            obj = JsonUtility.FromJson<T>(jsonString);
+            obj = JsonConvert.DeserializeObject<T>(jsonString);
 
             return obj != null;
         }
 
         public void Save<T>(T obj, string path)
         {
-            string jsonString = JsonUtility.ToJson(obj);
+            string jsonString = JsonConvert.SerializeObject(obj); 
             File.WriteAllText(path, jsonString);
         }
     }

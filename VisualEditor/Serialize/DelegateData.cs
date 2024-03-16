@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -7,16 +8,16 @@ namespace NPSerialization
 {
     public class DelegateData
     {
-        [System.NonSerialized]
+        [JsonIgnore]
         public Action m_action;
 
-        [System.NonSerialized]
+        [JsonIgnore]
         public Func<bool> m_singleFrameFunc;
 
-        [System.NonSerialized]
+        [JsonIgnore]
         public Func<bool, Result> m_multiFrameFunc;
 
-        [System.NonSerialized]
+        [JsonIgnore]
         public Func<Request, Result> m_multiFrameFunc2;
 
         public string ActionString

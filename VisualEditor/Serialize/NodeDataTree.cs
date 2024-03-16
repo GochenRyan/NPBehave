@@ -6,6 +6,6 @@ namespace NPSerialization
     {
         public long m_rootID;
 
-        public Dictionary<long, NodeData> m_nodeDataDict = new Dictionary<long, NodeData>();
+        public Dictionary<long, NodeData> m_nodeDataDict = new();
     }
 }

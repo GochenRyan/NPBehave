@@ -1,10 +1,11 @@
-﻿using NPBehave;
+﻿using Newtonsoft.Json;
+using NPBehave;
 
 namespace NPSerialization
 {
     public class WaitUtilStoppedData : NodeData
     {
-        [System.NonSerialized]
+        [JsonIgnore]
         public WaitUntilStopped m_waitUtilStopped;
         public bool sucessWhenStopped = false;
 

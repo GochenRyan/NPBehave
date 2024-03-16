@@ -1,4 +1,5 @@
-﻿using NPBehave;
+﻿using Newtonsoft.Json;
+using NPBehave;
 
 namespace NPSerialization
 {
@@ -8,7 +9,7 @@ namespace NPSerialization
         public Stops m_stopsOnChange;
         public BlackboardKVData m_blackboardData;
 
-        [System.NonSerialized]
+        [JsonIgnore]
         public BlackboardCondition m_blackboardCondition;
 
         public BlackboardConditionData(long id) : base(id)

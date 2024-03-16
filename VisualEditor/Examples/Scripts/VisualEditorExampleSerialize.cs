@@ -1,7 +1,10 @@
-﻿using NPBehave;
+﻿using Newtonsoft.Json;
+using NPBehave;
 using NPSerialization;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 namespace NPVisualEditor_Example
 {
@@ -10,6 +13,7 @@ namespace NPVisualEditor_Example
         private void Start()
         {
             CreateNodeDataTree();
+            ShowSerializationContent();
             Serialize();
         }
 
@@ -43,33 +47,40 @@ namespace NPVisualEditor_Example
             blackboardConditionData.m_stopsOnChange = Stops.IMMEDIATE_RESTART;
             blackboardConditionData.m_parentID = selectorData.m_ID;
             selectorData.m_linkedNodeIDs.Add(blackboardConditionData.m_ID);
+            m_nodeDataTree.m_nodeDataDict[blackboardConditionData.m_ID] = blackboardConditionData;
 
             var sequenceData1 = new SequenceData(ID);
             sequenceData1.m_parentID = blackboardConditionData.m_ID;
             blackboardConditionData.m_linkedNodeIDs.Add(sequenceData1.m_ID);
+            m_nodeDataTree.m_nodeDataDict[sequenceData1.m_ID] = sequenceData1;
 
             var actionData1 = new ActionData(ID);
             actionData1.m_actionData.m_action = SetColor;
             actionData1.m_parentID = sequenceData1.m_ID;
             sequenceData1.m_linkedNodeIDs.Add(actionData1.m_ID);
+            m_nodeDataTree.m_nodeDataDict[actionData1.m_ID] = actionData1;
 
             var actionData2 = new ActionData(ID);
             actionData2.m_actionData.m_multiFrameFunc = Move;
             actionData2.m_parentID = sequenceData1.m_ID;
             sequenceData1.m_linkedNodeIDs.Add(actionData2.m_ID);
+            m_nodeDataTree.m_nodeDataDict[actionData2.m_ID] = actionData2;
 
             var sequenceData2 = new SequenceData(ID);
             sequenceData2.m_parentID = selectorData.m_ID;
             selectorData.m_linkedNodeIDs.Add(sequenceData2.m_ID);
+            m_nodeDataTree.m_nodeDataDict[sequenceData2.m_ID] = sequenceData2;
 
             var actionData3 = new ActionData(ID);
             actionData3.m_actionData.m_action = SetColor;
             actionData3.m_parentID = sequenceData2.m_ID;
             sequenceData2.m_linkedNodeIDs.Add(actionData3.m_ID);
+            m_nodeDataTree.m_nodeDataDict[actionData3.m_ID] = actionData3;
 
             var waitUtilStoppedData = new WaitUtilStoppedData(ID);
             waitUtilStoppedData.m_parentID = sequenceData2.m_ID;
             sequenceData2.m_linkedNodeIDs.Add(waitUtilStoppedData.m_ID);
+            m_nodeDataTree.m_nodeDataDict[waitUtilStoppedData.m_ID] = waitUtilStoppedData;
         }
 
         private static void UpdateBlackboard()
@@ -94,6 +105,12 @@ namespace NPVisualEditor_Example
             }
         }
 
+        private void ShowSerializationContent()
+        {
+            string jsonString = JsonConvert.SerializeObject(m_nodeDataTree, Formatting.Indented);
+            m_content.text = jsonString;
+        }
+
         private void Serialize()
         {
             var jsonStream = new JsonStream();
@@ -113,5 +130,6 @@ namespace NPVisualEditor_Example
         }
 
         private NodeDataTree m_nodeDataTree;
+        public Text m_content;
     }
 }

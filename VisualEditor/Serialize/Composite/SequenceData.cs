@@ -1,10 +1,11 @@
-﻿using NPBehave;
+﻿using Newtonsoft.Json;
+using NPBehave;
 
 namespace NPSerialization
 {
     public class SequenceData : NodeData
     {
-        [System.NonSerialized]
+        [JsonIgnore]
         public Sequence m_sequence;
 
         public SequenceData(long id) : base(id)

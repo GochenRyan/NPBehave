@@ -1,14 +1,15 @@
-﻿using NPBehave;
+﻿using Newtonsoft.Json;
+using NPBehave;
 
 namespace NPSerialization
 {
     public class ServiceData : NodeData
     {
-        [System.NonSerialized]
+        [JsonIgnore]
         public Service m_service;
 
         public float m_interval = -1.0f;
-        public DelegateData m_delegateData;
+        public DelegateData m_delegateData = new();
 
         public ServiceData(long id) : base(id)
         {
