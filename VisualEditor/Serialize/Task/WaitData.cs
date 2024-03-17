@@ -11,9 +11,10 @@ namespace NPSerialization
 
         public WaitData(long id) : base(id)
         {
+            m_nodeType = NodeType.Task;
         }
 
-        public Task CreateTask()
+        public override Task CreateTask()
         {
             m_wait = new Wait(m_seconds);
             return m_wait;

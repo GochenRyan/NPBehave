@@ -10,9 +10,10 @@ namespace NPSerialization
 
         public SelectorData(long id) : base(id)
         {
+            m_nodeType = NodeType.Composite;
         }
 
-        public Composite CrateComposite(Node[] nodes)
+        public override Composite CreateComposite(Node[] nodes)
         {
             m_selector = new Selector(nodes);
             return m_selector;

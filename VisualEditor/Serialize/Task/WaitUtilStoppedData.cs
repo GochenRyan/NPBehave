@@ -11,9 +11,10 @@ namespace NPSerialization
 
         public WaitUtilStoppedData(long id) : base(id)
         {
+            m_nodeType = NodeType.Task;
         }
 
-        public Task CreateTask()
+        public override Task CreateTask()
         {
             m_waitUtilStopped = new WaitUntilStopped(sucessWhenStopped);
             return m_waitUtilStopped;

@@ -3,7 +3,6 @@ using NPBehave;
 using NPSerialization;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace NPVisualEditor_Example
@@ -13,8 +12,6 @@ namespace NPVisualEditor_Example
         private void Start()
         {
             CreateNodeDataTree();
-            ShowSerializationContent();
-            Serialize();
         }
 
         private void CreateNodeDataTree()
@@ -93,15 +90,15 @@ namespace NPVisualEditor_Example
 
         }
 
-        private static Action.Result Move(bool shouldCancel)
+        private static NPBehave.Action.Result Move(bool shouldCancel)
         {
             if (!shouldCancel)
             {
-                return Action.Result.PROGRESS;
+                return NPBehave.Action.Result.PROGRESS;
             }
             else
             {
-                return Action.Result.FAILED;
+                return NPBehave.Action.Result.FAILED;
             }
         }
 
@@ -109,13 +106,23 @@ namespace NPVisualEditor_Example
         {
             string jsonString = JsonConvert.SerializeObject(m_nodeDataTree, Formatting.Indented);
             m_content.text = jsonString;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(m_content.GetComponent<RectTransform>());
         }
 
-        private void Serialize()
+        public void Serialize()
         {
+            ShowSerializationContent();
             var jsonStream = new JsonStream();
             string path = Path.Combine(Application.dataPath, "test_tree.json");
             jsonStream.Save(m_nodeDataTree, path);
+        }
+
+        public void Deserialize()
+        {
+            var jsonStream = new JsonStream();
+            string path = Path.Combine(Application.dataPath, "test_tree.json");
+            jsonStream.Load(path, out NodeDataTree nodeDataTree);
+            nodeDataTree.CreateNPBehaveTree();
         }
 
         private long m_id = 0;

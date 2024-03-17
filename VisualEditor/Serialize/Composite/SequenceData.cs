@@ -10,9 +10,10 @@ namespace NPSerialization
 
         public SequenceData(long id) : base(id)
         {
+            m_nodeType = NodeType.Composite;
         }
 
-        public Composite CreateComposite(Node[] nodes)
+        public override Composite CreateComposite(Node[] nodes)
         {
             m_sequence = new Sequence(nodes);
             return m_sequence;

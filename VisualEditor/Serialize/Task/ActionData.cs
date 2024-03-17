@@ -12,9 +12,10 @@ namespace NPSerialization
 
         public ActionData(long id) : base(id)
         {
+            m_nodeType = NodeType.Task;
         }
 
-        public virtual Task CreateTask()
+        public override Task CreateTask()
         {
             if (m_actionData.m_action != null)
             {

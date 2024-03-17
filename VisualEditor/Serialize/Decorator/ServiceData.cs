@@ -13,9 +13,10 @@ namespace NPSerialization
 
         public ServiceData(long id) : base(id)
         {
+            m_nodeType = NodeType.Decorator;
         }
 
-        public Service CreateService(Node node)
+        public override Decorator CreateDecorator(Node node)
         {
             if (m_delegateData.m_action == null)
                 throw new Exception("No Service Method!");

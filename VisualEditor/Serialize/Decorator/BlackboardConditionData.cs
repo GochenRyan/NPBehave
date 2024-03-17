@@ -14,9 +14,10 @@ namespace NPSerialization
 
         public BlackboardConditionData(long id) : base(id)
         {
+            m_nodeType = NodeType.Decorator;
         }
 
-        public Decorator CreateDecorator(Node node)
+        public override Decorator CreateDecorator(Node node)
         {
             switch (m_blackboardData.m_compareType)
             {
