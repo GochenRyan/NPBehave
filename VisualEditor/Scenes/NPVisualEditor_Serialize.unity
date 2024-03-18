@@ -300,7 +300,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1913942071}
         m_TargetAssemblyTypeName: NPVisualEditor_Example.VisualEditorExampleSerialize,
           Assembly-CSharp
-        m_MethodName: Deserialize
+        m_MethodName: TestDeserialize
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -434,7 +434,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1913942071}
         m_TargetAssemblyTypeName: NPVisualEditor_Example.VisualEditorExampleSerialize,
           Assembly-CSharp
-        m_MethodName: Serialize
+        m_MethodName: TestSerialize
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

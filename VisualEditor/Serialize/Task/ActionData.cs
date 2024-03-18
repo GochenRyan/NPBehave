@@ -5,10 +5,17 @@ namespace NPSerialization
 {
     public class ActionData : NodeData
     {
+        public override string TYPE_NAME_FOR_SERIALIZATION { get { return typeof(ActionData).FullName; } }
+
         [JsonIgnore]
         public Action m_action;
 
         public DelegateData m_actionData = new();
+
+        public ActionData() : base()
+        {
+            m_nodeType = NodeType.Task;
+        }
 
         public ActionData(long id) : base(id)
         {
@@ -21,15 +28,15 @@ namespace NPSerialization
             {
                 m_action = new Action(m_actionData.m_action);
             }
-            else if (m_actionData.m_singleFrameFunc == null)
+            else if (m_actionData.m_singleFrameFunc != null)
             {
                 m_action = new Action(m_actionData.m_singleFrameFunc);
             }
-            else if (m_actionData.m_singleFrameFunc == null)
+            else if (m_actionData.m_multiFrameFunc != null)
             {
                 m_action = new Action(m_actionData.m_multiFrameFunc);
             }
-            else if (m_actionData.m_singleFrameFunc == null)
+            else if (m_actionData.m_multiFrameFunc2 != null)
             {
                 m_action = new Action(m_actionData.m_multiFrameFunc2);
             }

@@ -5,8 +5,15 @@ namespace NPSerialization
 {
     public class SequenceData : NodeData
     {
+        public override string TYPE_NAME_FOR_SERIALIZATION { get { return typeof(SequenceData).FullName; } }
+
         [JsonIgnore]
         public Sequence m_sequence;
+
+        public SequenceData() : base()
+        {
+            m_nodeType = NodeType.Composite;
+        }
 
         public SequenceData(long id) : base(id)
         {

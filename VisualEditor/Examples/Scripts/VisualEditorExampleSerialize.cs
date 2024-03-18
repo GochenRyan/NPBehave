@@ -23,14 +23,13 @@ namespace NPVisualEditor_Example
             m_nodeDataTree.m_rootID = rootData.m_ID;
 
             var serviceData = new ServiceData(ID);
-            serviceData.m_parentID = rootData.m_ID;
             serviceData.m_interval = 0.125f;
             serviceData.m_delegateData.m_action = UpdateBlackboard;
-            rootData.m_linkedNodeIDs.Add(serviceData.m_ID);
+            NodeDataUtils.AddChild(rootData, serviceData);
             m_nodeDataTree.m_nodeDataDict[serviceData.m_ID] = serviceData;
 
             var selectorData = new SelectorData(ID);
-            selectorData.m_parentID = serviceData.m_ID;
+            NodeDataUtils.AddChild(serviceData, selectorData);
             m_nodeDataTree.m_nodeDataDict[selectorData.m_ID] = selectorData;
 
             var blackboardConditionData = new BlackboardConditionData(ID);
@@ -42,42 +41,35 @@ namespace NPVisualEditor_Example
             };
             blackboardConditionData.m_operator = Operator.IS_SMALLER;
             blackboardConditionData.m_stopsOnChange = Stops.IMMEDIATE_RESTART;
-            blackboardConditionData.m_parentID = selectorData.m_ID;
-            selectorData.m_linkedNodeIDs.Add(blackboardConditionData.m_ID);
+            NodeDataUtils.AddChild(selectorData, blackboardConditionData);
             m_nodeDataTree.m_nodeDataDict[blackboardConditionData.m_ID] = blackboardConditionData;
 
             var sequenceData1 = new SequenceData(ID);
-            sequenceData1.m_parentID = blackboardConditionData.m_ID;
-            blackboardConditionData.m_linkedNodeIDs.Add(sequenceData1.m_ID);
+            NodeDataUtils.AddChild(blackboardConditionData, sequenceData1);
             m_nodeDataTree.m_nodeDataDict[sequenceData1.m_ID] = sequenceData1;
 
             var actionData1 = new ActionData(ID);
             actionData1.m_actionData.m_action = SetColor;
-            actionData1.m_parentID = sequenceData1.m_ID;
-            sequenceData1.m_linkedNodeIDs.Add(actionData1.m_ID);
             m_nodeDataTree.m_nodeDataDict[actionData1.m_ID] = actionData1;
 
             var actionData2 = new ActionData(ID);
             actionData2.m_actionData.m_multiFrameFunc = Move;
-            actionData2.m_parentID = sequenceData1.m_ID;
-            sequenceData1.m_linkedNodeIDs.Add(actionData2.m_ID);
             m_nodeDataTree.m_nodeDataDict[actionData2.m_ID] = actionData2;
 
+            NodeDataUtils.AddChildren(sequenceData1, actionData1, actionData2);
+
             var sequenceData2 = new SequenceData(ID);
-            sequenceData2.m_parentID = selectorData.m_ID;
-            selectorData.m_linkedNodeIDs.Add(sequenceData2.m_ID);
+            NodeDataUtils.AddChild(selectorData, sequenceData2);
             m_nodeDataTree.m_nodeDataDict[sequenceData2.m_ID] = sequenceData2;
 
             var actionData3 = new ActionData(ID);
             actionData3.m_actionData.m_action = SetColor;
-            actionData3.m_parentID = sequenceData2.m_ID;
-            sequenceData2.m_linkedNodeIDs.Add(actionData3.m_ID);
             m_nodeDataTree.m_nodeDataDict[actionData3.m_ID] = actionData3;
 
             var waitUtilStoppedData = new WaitUtilStoppedData(ID);
-            waitUtilStoppedData.m_parentID = sequenceData2.m_ID;
-            sequenceData2.m_linkedNodeIDs.Add(waitUtilStoppedData.m_ID);
             m_nodeDataTree.m_nodeDataDict[waitUtilStoppedData.m_ID] = waitUtilStoppedData;
+
+            NodeDataUtils.AddChildren(sequenceData2, actionData3, waitUtilStoppedData);
         }
 
         private static void UpdateBlackboard()
@@ -109,7 +101,7 @@ namespace NPVisualEditor_Example
             LayoutRebuilder.ForceRebuildLayoutImmediate(m_content.GetComponent<RectTransform>());
         }
 
-        public void Serialize()
+        public void TestSerialize()
         {
             ShowSerializationContent();
             var jsonStream = new JsonStream();
@@ -117,12 +109,15 @@ namespace NPVisualEditor_Example
             jsonStream.Save(m_nodeDataTree, path);
         }
 
-        public void Deserialize()
+        public void TestDeserialize()
         {
             var jsonStream = new JsonStream();
             string path = Path.Combine(Application.dataPath, "test_tree.json");
             jsonStream.Load(path, out NodeDataTree nodeDataTree);
-            nodeDataTree.CreateNPBehaveTree();
+            nodeDataTree.CreateTreeByNodeData();
+
+            var rootData = nodeDataTree.m_nodeDataDict[m_nodeDataTree.m_rootID] as RootData;
+            rootData.GetNode().Start();
         }
 
         private long m_id = 0;

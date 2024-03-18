@@ -5,12 +5,19 @@ namespace NPSerialization
 {
     public class BlackboardConditionData : NodeData
     {
+        public override string TYPE_NAME_FOR_SERIALIZATION { get { return typeof(BlackboardConditionData).FullName; } }
+
         public Operator m_operator;
         public Stops m_stopsOnChange;
         public BlackboardKVData m_blackboardData;
 
         [JsonIgnore]
         public BlackboardCondition m_blackboardCondition;
+
+        public BlackboardConditionData() : base()
+        {
+            m_nodeType = NodeType.Decorator;
+        }
 
         public BlackboardConditionData(long id) : base(id)
         {

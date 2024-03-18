@@ -5,9 +5,16 @@ namespace NPSerialization
 {
     public class WaitData : NodeData
     {
+        public override string TYPE_NAME_FOR_SERIALIZATION { get { return typeof(WaitData).FullName; } }
+
         [JsonIgnore]
         public Wait m_wait;
         public float m_seconds;
+
+        public WaitData() : base()
+        {
+            m_nodeType = NodeType.Task;
+        }
 
         public WaitData(long id) : base(id)
         {

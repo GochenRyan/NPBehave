@@ -10,19 +10,45 @@ namespace NPSerialization
 
         public Dictionary<long, NodeData> m_nodeDataDict = new();
 
-        public void CreateNPBehaveTree()
+        public void CreateTreeByNodeData()
         {
-            foreach (var pair in m_nodeDataDict)
+            if (!m_nodeDataDict.ContainsKey(m_rootID))
+                return;
+
+            Stack<NodeData> stack = new();
+            Queue<NodeData> tmpQueue = new();
+            tmpQueue.Enqueue(m_nodeDataDict[m_rootID]);
+
+            while (tmpQueue.Count > 0) 
             {
-                switch (pair.Value.m_nodeType) 
+                NodeData tmp = tmpQueue.Dequeue();
+                if (tmp.m_linkedNodeIDs.Count > 0)
+                {
+                    for (int i = 0; i <  tmp.m_linkedNodeIDs.Count; ++i)
+                    {
+                        if (m_nodeDataDict.TryGetValue(tmp.m_linkedNodeIDs[i], out var linkedNodeData))
+                        {
+                            tmpQueue.Enqueue(linkedNodeData);
+                        }
+                    }
+                }
+                stack.Push(tmp);
+            }
+
+            // Create this tree from dependencies to root
+            
+            while(stack.Count > 0)
+            {
+                NodeData current = stack.Pop();
+                switch (current.m_nodeType)
                 {
                     case NodeType.Task:
-                        pair.Value.CreateTask();
+                        current.CreateTask();
                         break;
                     case NodeType.Decorator:
-                        if (m_nodeDataDict.TryGetValue(pair.Value.m_linkedNodeIDs[0], out NodeData tmpDecorateeData))
+                        if (m_nodeDataDict.TryGetValue(current.m_linkedNodeIDs[0], out NodeData tmpDecorateeData))
                         {
-                            pair.Value.CreateDecorator(tmpDecorateeData.GetNode());
+                            current.CreateDecorator(tmpDecorateeData.GetNode());
                         }
                         else
                         {
@@ -31,7 +57,7 @@ namespace NPSerialization
                         break;
                     case NodeType.Composite:
                         List<Node> tmpNodes = new();
-                        foreach(var linkID in pair.Value.m_linkedNodeIDs)
+                        foreach (var linkID in current.m_linkedNodeIDs)
                         {
                             if (m_nodeDataDict.TryGetValue(linkID, out NodeData tmp))
                             {
@@ -42,7 +68,7 @@ namespace NPSerialization
                                 throw new Exception("Node lost!");
                             }
                         }
-                        pair.Value.CreateComposite(tmpNodes.ToArray());
+                        current.CreateComposite(tmpNodes.ToArray());
                         break;
                 }
             }
