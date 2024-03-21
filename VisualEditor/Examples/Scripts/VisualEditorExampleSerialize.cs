@@ -82,15 +82,15 @@ namespace NPVisualEditor_Example
 
         }
 
-        private static NPBehave.Action.Result Move(bool shouldCancel)
+        private static Action.Result Move(bool shouldCancel)
         {
             if (!shouldCancel)
             {
-                return NPBehave.Action.Result.PROGRESS;
+                return Action.Result.PROGRESS;
             }
             else
             {
-                return NPBehave.Action.Result.FAILED;
+                return Action.Result.FAILED;
             }
         }
 

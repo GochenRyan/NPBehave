@@ -9,180 +9,159 @@ namespace NPSerialization
     public class DelegateData
     {
         [JsonIgnore]
-        public Action m_action;
+        public Action? m_action;
 
         [JsonIgnore]
-        public Func<bool> m_singleFrameFunc;
+        public Func<bool>? m_singleFrameFunc;
 
         [JsonIgnore]
-        public Func<bool, Result> m_multiFrameFunc;
+        public Func<bool, Result>? m_multiFrameFunc;
 
         [JsonIgnore]
-        public Func<Request, Result> m_multiFrameFunc2;
+        public Func<Request, Result>? m_multiFrameFunc2;
 
-        public string ActionString
+
+        public string? ActionString
         {
             get
             {
-                return m_action != null ? $"{m_action.Method.ReflectedType.FullName}|{m_action.Method.Name}" : null;
+                return GetSerializeString(m_action);
             }
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    m_action = null;
-                }
-                else
-                {
-                    var parts = value.Split('|');
-                    var typeName = parts.Length > 1 ? parts[0] : null;
-                    var methodName = parts.Length > 1 ? parts[1] : parts[0];
-
-                    var type = typeName != null ? Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.FullName == typeName) : null;
-
-                    if (type == null)
-                    {
-                        throw new ArgumentException($"Type {typeName} not found.");
-                    }
-
-                    var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-                    if (method == null)
-                    {
-                        throw new ArgumentException($"Static method {methodName} not found in type {typeName}.");
-                    }
-
-                    // Ensure the method is static
-                    if (!method.IsStatic)
-                    {
-                        throw new ArgumentException($"Method {methodName} in type {typeName} is not static.");
-                    }
-
-                    m_action = (Action)Delegate.CreateDelegate(typeof(Action), method);
-                }
+                m_action = (Action?)GetDelegate<Action>(value);
             }
         }
 
-        public string SingleFrameFuncString
+        public string? SingleFrameFuncString
         {
             get
             {
-                return SerializeFunc<bool>(m_singleFrameFunc);
+                return GetSerializeString(m_singleFrameFunc);
             }
             set
             {
-                m_singleFrameFunc = DeserializeFunc<bool>(value);
+                m_singleFrameFunc = (Func<bool>?)GetDelegate<Func<bool>>(value);
             }
         }
 
-        public string MultiFrameFuncString
+        public string? MultiFrameFuncString
         {
             get
             {
-                return SerializeFunc<bool, Result>(m_multiFrameFunc);
+                return GetSerializeString(m_multiFrameFunc);
             }
             set
             {
-                m_multiFrameFunc = DeserializeFunc<bool, Result>(value);
+                m_multiFrameFunc = (Func<bool, Result>?)GetDelegate<Func<bool, Result>>(value);
             }
         }
 
-        public string MultiFrameFunc2String
+        public string? MultiFrameFunc2String
         {
             get
             {
-                return SerializeFunc<Request, Result>(m_multiFrameFunc2);
+                return GetSerializeString(m_multiFrameFunc2);
             }
             set
             {
-                m_multiFrameFunc2 = DeserializeFunc<Request, Result>(value);
+
+                m_multiFrameFunc2 = (Func<Request, Result>?)GetDelegate<Func<Request, Result>>(value);
             }
         }
 
-        private string SerializeFunc<T>(Func<T> func)
+        private string? GetSerializeString<T>(T? delegateFunction) where T : System.Delegate
         {
-            if (func == null)
+            if (delegateFunction == null)
                 return null;
 
-            var method = func.Method;
-            var typeName = method.ReflectedType.FullName;
-            var methodName = method.Name;
+            if (delegateFunction.Method.ReflectedType == null)
+                return null;
 
-            return $"{typeName}|{methodName}";
+            if (delegateFunction.Method.IsStatic)
+            {
+                return $"{delegateFunction.Method.ReflectedType.FullName}|{delegateFunction.Method.Name}";
+            }
+            else
+            {
+                object? instance = delegateFunction.Target;
+                if (instance == null)
+                    return null;
+
+                Type type = instance.GetType();
+                var fields = type.GetFields();
+                long IDObject = 0;
+                foreach (var field in fields)
+                {
+                    if (Attribute.IsDefined(field, typeof(SerializationIDAttribute)))
+                    {
+                        IDObject = Convert.ToInt64(field.GetValue(instance));
+                        break;
+                    }
+                }
+
+                return $"{instance.GetType().FullName}|{IDObject}|{delegateFunction.Method.Name}";
+            }
         }
 
-        private Func<T> DeserializeFunc<T>(string value)
+        private Delegate? GetDelegate<T>(string? value) where T : System.Delegate
         {
             if (string.IsNullOrEmpty(value))
+            {
                 return null;
-
-            var parts = value.Split('|');
-            var typeName = parts[0];
-            var methodName = parts[1];
-
-            var type = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.FullName == typeName);
-
-            if (type == null)
-            {
-                throw new ArgumentException($"Type {typeName} not found.");
             }
-
-            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (method == null)
+            else
             {
-                throw new ArgumentException($"Method {methodName} not found in type {typeName}.");
+                var parts = value.Split('|');
+                string? typeName = null;
+                long ID = 0;
+                string? methodName = null;
+
+                if (parts.Length == 2)
+                {
+                    typeName = parts[0];
+                    methodName = parts[1];
+                }
+                else if (parts.Length == 3)
+                {
+                    typeName = parts[0];
+                    ID = Convert.ToInt64(parts[1]);
+                    methodName = parts[2];
+                }
+
+                var type = typeName != null ? Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.FullName == typeName) : null;
+
+                if (type == null)
+                {
+                    throw new ArgumentException($"Type {typeName} not found.");
+                }
+
+                if (methodName == null)
+                {
+                    return null;
+                }
+
+                var method = type.GetMethod(methodName);
+
+                if (method == null)
+                {
+                    throw new ArgumentException($"Static method {methodName} not found in type {typeName}.");
+                }
+
+                if (!method.IsStatic)
+                {
+                    var fields = type.GetFields();
+                    object? instance;
+                    if (ID == 0 || !InstanceContext.Instance.TryGetReference(type, ID, out instance))
+                    {
+                        return null;
+                    }
+
+                    return (T)Delegate.CreateDelegate(typeof(T), instance, method);
+                }
+
+                return (T)Delegate.CreateDelegate(typeof(T), method);
             }
-
-            if (method.ReturnType != typeof(T))
-            {
-                throw new ArgumentException($"Method {methodName} in type {typeName} does not return {typeof(T)}.");
-            }
-
-            return (Func<T>)Delegate.CreateDelegate(typeof(Func<T>), method);
-        }
-
-        private string SerializeFunc<T, TResult>(Func<T, TResult> func)
-        {
-            if (func == null)
-                return null;
-
-            var method = func.Method;
-            var typeName = method.ReflectedType.FullName;
-            var methodName = method.Name;
-
-            return $"{typeName}|{methodName}";
-        }
-
-        private Func<T, TResult> DeserializeFunc<T, TResult>(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return null;
-
-            var parts = value.Split('|');
-            var typeName = parts[0];
-            var methodName = parts[1];
-
-            var type = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.FullName == typeName);
-
-            if (type == null)
-            {
-                throw new ArgumentException($"Type {typeName} not found.");
-            }
-
-            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (method == null)
-            {
-                throw new ArgumentException($"Method {methodName} not found in type {typeName}.");
-            }
-
-            if (method.ReturnType != typeof(TResult) || method.GetParameters().Length != 1 || method.GetParameters()[0].ParameterType != typeof(T))
-            {
-                throw new ArgumentException($"Method {methodName} in type {typeName} does not match Func<{typeof(T)}, {typeof(TResult)}> signature.");
-            }
-
-            return (Func<T, TResult>)Delegate.CreateDelegate(typeof(Func<T, TResult>), method);
         }
     }
 }
