@@ -104,7 +104,7 @@ namespace NPSerialization
             }
         }
 
-        private Delegate? GetDelegate<T>(string? value) where T : System.Delegate
+        private Delegate GetDelegate<T>(string value) where T : System.Delegate
         {
             if (string.IsNullOrEmpty(value))
             {
@@ -113,9 +113,9 @@ namespace NPSerialization
             else
             {
                 var parts = value.Split('|');
-                string? typeName = null;
+                string typeName = null;
                 long ID = 0;
-                string? methodName = null;
+                string methodName = null;
 
                 if (parts.Length == 2)
                 {
@@ -151,7 +151,7 @@ namespace NPSerialization
                 if (!method.IsStatic)
                 {
                     var fields = type.GetFields();
-                    object? instance;
+                    object instance;
                     if (ID == 0 || !InstanceContext.Instance.TryGetReference(type, ID, out instance))
                     {
                         return null;
