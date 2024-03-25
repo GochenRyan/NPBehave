@@ -54,6 +54,10 @@ namespace NPVisualEditor
             m_inspectorContainer.Add(m_inspector);
 
             m_leftPanelSplitView.Add(m_inspectorContainer);
+
+            m_graphicView = new GraphicView();
+            m_graphicView.StretchToParentSize();
+            m_rightPanel.Add(m_graphicView);
         }
 
         private VisualElement m_leftPanel;
@@ -64,6 +68,8 @@ namespace NPVisualEditor
         private ScrollView m_inspector;
         private VisualElement m_blackboardContainer;
         private VisualElement m_blackboard;
+
+        private GraphicView m_graphicView;
     }
 }
 

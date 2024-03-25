@@ -1,3 +1,4 @@
+using NPVisualEditor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,15 +17,11 @@ public class VisualEditor : EditorWindow
 
     public void CreateGUI()
     {
-        // Each editor window contains a root VisualElement object
         VisualElement root = rootVisualElement;
 
-        // VisualElements objects can contain other VisualElement following a tree hierarchy.
-        VisualElement label = new Label("Hello World! From C#");
-        root.Add(label);
-
-        // Instantiate UXML
-        VisualElement labelFromUXML = m_VisualTreeAsset.Instantiate();
-        root.Add(labelFromUXML);
+        VisualTreeAsset visualEditor = Resources.Load<VisualTreeAsset>("VisualEditor");
+        TemplateContainer editorInstance = visualEditor.CloneTree();
+        editorInstance.StretchToParentSize();
+        rootVisualElement.Add(editorInstance);
     }
 }

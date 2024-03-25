@@ -9,19 +9,19 @@ namespace NPSerialization
     public class DelegateData
     {
         [JsonIgnore]
-        public Action? m_action;
+        public Action m_action;
 
         [JsonIgnore]
-        public Func<bool>? m_singleFrameFunc;
+        public Func<bool> m_singleFrameFunc;
 
         [JsonIgnore]
-        public Func<bool, Result>? m_multiFrameFunc;
+        public Func<bool, Result> m_multiFrameFunc;
 
         [JsonIgnore]
-        public Func<Request, Result>? m_multiFrameFunc2;
+        public Func<Request, Result> m_multiFrameFunc2;
 
 
-        public string? ActionString
+        public string ActionString
         {
             get
             {
@@ -29,11 +29,11 @@ namespace NPSerialization
             }
             set
             {
-                m_action = (Action?)GetDelegate<Action>(value);
+                m_action = (Action)GetDelegate<Action>(value);
             }
         }
 
-        public string? SingleFrameFuncString
+        public string SingleFrameFuncString
         {
             get
             {
@@ -41,11 +41,11 @@ namespace NPSerialization
             }
             set
             {
-                m_singleFrameFunc = (Func<bool>?)GetDelegate<Func<bool>>(value);
+                m_singleFrameFunc = (Func<bool>)GetDelegate<Func<bool>>(value);
             }
         }
 
-        public string? MultiFrameFuncString
+        public string MultiFrameFuncString
         {
             get
             {
@@ -53,11 +53,11 @@ namespace NPSerialization
             }
             set
             {
-                m_multiFrameFunc = (Func<bool, Result>?)GetDelegate<Func<bool, Result>>(value);
+                m_multiFrameFunc = (Func<bool, Result>)GetDelegate<Func<bool, Result>>(value);
             }
         }
 
-        public string? MultiFrameFunc2String
+        public string MultiFrameFunc2String
         {
             get
             {
@@ -66,11 +66,11 @@ namespace NPSerialization
             set
             {
 
-                m_multiFrameFunc2 = (Func<Request, Result>?)GetDelegate<Func<Request, Result>>(value);
+                m_multiFrameFunc2 = (Func<Request, Result>)GetDelegate<Func<Request, Result>>(value);
             }
         }
 
-        private string? GetSerializeString<T>(T? delegateFunction) where T : System.Delegate
+        private string GetSerializeString<T>(T delegateFunction) where T : System.Delegate
         {
             if (delegateFunction == null)
                 return null;
@@ -84,7 +84,7 @@ namespace NPSerialization
             }
             else
             {
-                object? instance = delegateFunction.Target;
+                object instance = delegateFunction.Target;
                 if (instance == null)
                     return null;
 

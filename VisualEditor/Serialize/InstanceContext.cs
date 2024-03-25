@@ -35,7 +35,7 @@ namespace NPSerialization
             return true;
         }
 
-        public bool TryGetReference(Type type, long id, out object? reference)
+        public bool TryGetReference(Type type, long id, out object reference)
         {
             reference = null;
             if (m_TypeToWeakReferenceDict.ContainsKey(type))
