@@ -17,11 +17,16 @@ public class VisualEditor : EditorWindow
 
     public void CreateGUI()
     {
-        VisualElement root = rootVisualElement;
-
         VisualTreeAsset visualEditor = Resources.Load<VisualTreeAsset>("VisualEditor");
         TemplateContainer editorInstance = visualEditor.CloneTree();
         editorInstance.StretchToParentSize();
         rootVisualElement.Add(editorInstance);
+
+        m_blackboardPanel = rootVisualElement.Q<VisualElement>("Blackboard");
+        VisualTreeAsset blackboardViewTree = Resources.Load<VisualTreeAsset>("BlackboardPanel");
+        TemplateContainer blackboardViewInstance = blackboardViewTree.CloneTree();
+        m_blackboardPanel.Add(blackboardViewInstance);
     }
+
+    public VisualElement m_blackboardPanel;
 }

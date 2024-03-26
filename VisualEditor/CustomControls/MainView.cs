@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NPVisualEditor
@@ -45,20 +46,22 @@ namespace NPVisualEditor
             m_blackboardContainer = new VisualElement();
             m_blackboardContainer.name = "BlackboardContainer";
             m_blackboardContainer.style.minHeight = 192.0f;
-            m_leftPanelSplitView.Add(m_inspectorContainer);
+            m_leftPanelSplitView.Add(m_blackboardContainer);
             m_blackboard = new VisualElement();
             m_blackboard.name = "Blackboard";
             Label blackboardTitle = new Label("Blackboard");
             blackboardTitle.name = "BlackboardTitle";
             m_blackboardContainer.Add(blackboardTitle);
-            m_inspectorContainer.Add(m_inspector);
-
-            m_leftPanelSplitView.Add(m_inspectorContainer);
+            m_blackboardContainer.Add(m_blackboard);
 
             m_graphicView = new GraphicView();
             m_graphicView.StretchToParentSize();
             m_rightPanel.Add(m_graphicView);
+
+            m_leftPanel.Add(m_leftPanelSplitView);
         }
+
+
 
         private VisualElement m_leftPanel;
         private VisualElement m_rightPanel;
