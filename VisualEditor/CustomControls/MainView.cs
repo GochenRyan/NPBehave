@@ -55,6 +55,7 @@ namespace NPVisualEditor
             m_blackboardContainer.Add(m_blackboard);
 
             m_graphicView = new GraphicView();
+            m_graphicView.name = "GraphicView";
             m_graphicView.StretchToParentSize();
             m_rightPanel.Add(m_graphicView);
 

@@ -141,7 +141,7 @@ namespace NPSerialization
                     return null;
                 }
 
-                var method = type.GetMethod(methodName);
+                var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
 
                 if (method == null)
                 {

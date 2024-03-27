@@ -16,9 +16,6 @@ namespace NPVisualEditor
             this.AddManipulator(new RectangleSelector());
             var grid = new GridBackground();
             Insert(0, grid);
-
-            CreateNode(new Vector2(10, 10));
-            CreateNode(new Vector2(10, 300));
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
