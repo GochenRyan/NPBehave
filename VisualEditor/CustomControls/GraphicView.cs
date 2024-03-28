@@ -50,6 +50,14 @@ namespace NPVisualEditor
             return node;
         }
 
+        public void ClearGraphNodes()
+        {
+            DeleteElements(this.Query<GraphNode>().ToList());
+            DeleteElements(this.Query<Edge>().ToList());
+            RootNode = null;
+        }
+
         public readonly Vector2 DEFAULT_NODE_SIZE = new(150, 200);
+        public GraphNode RootNode { get; set; } = null;
     }
 }

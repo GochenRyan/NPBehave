@@ -20,22 +20,33 @@ namespace NPVisualEditor
 
             m_leftPanel = new VisualElement();
             m_leftPanel.name = "LeftPanel";
-            m_leftPanel.style.minWidth = 208.0f;
+            m_leftPanel.style.minWidth = 400.0f;
             this.Add(m_leftPanel);
 
             m_rightPanel = new VisualElement();
             m_rightPanel.name = "RightPanel";
-            m_rightPanel.style.minWidth = 144.0f;
+            m_rightPanel.style.minWidth = 600.0f;
             this.Add(m_rightPanel);
 
-            m_leftPanelSplitView = new TwoPaneSplitView();
+            m_leftPanelSplitView = new TwoPaneSplitView(0, 200f, TwoPaneSplitViewOrientation.Horizontal);
             m_leftPanelSplitView.name = "LeftPanelSplitView";
-            m_leftPanelSplitView.orientation = TwoPaneSplitViewOrientation.Vertical;
+
+            m_blackboardContainer = new VisualElement();
+            m_blackboardContainer.name = "BlackboardContainer";
+            m_blackboardContainer.style.minWidth = 200.0f;
+
+            m_blackboard = new VisualElement();
+            m_blackboard.name = "Blackboard";
+            Label blackboardTitle = new Label("Blackboard");
+            blackboardTitle.name = "BlackboardTitle";
+            m_blackboardContainer.Add(blackboardTitle);
+            m_blackboardContainer.Add(m_blackboard);
+
+            m_leftPanelSplitView.Add(m_blackboardContainer);
 
             m_inspectorContainer = new VisualElement();
             m_inspectorContainer.name = "InspectorContainer";
-            m_inspectorContainer.style.minHeight = 192.0f;
-            m_leftPanelSplitView.Add(m_inspectorContainer);
+
             m_inspector = new ScrollView();
             m_inspector.name = "Inspector";
             Label inspectorTitle = new Label("Inspector");
@@ -43,16 +54,7 @@ namespace NPVisualEditor
             m_inspectorContainer.Add(inspectorTitle);
             m_inspectorContainer.Add(m_inspector);
 
-            m_blackboardContainer = new VisualElement();
-            m_blackboardContainer.name = "BlackboardContainer";
-            m_blackboardContainer.style.minHeight = 192.0f;
-            m_leftPanelSplitView.Add(m_blackboardContainer);
-            m_blackboard = new VisualElement();
-            m_blackboard.name = "Blackboard";
-            Label blackboardTitle = new Label("Blackboard");
-            blackboardTitle.name = "BlackboardTitle";
-            m_blackboardContainer.Add(blackboardTitle);
-            m_blackboardContainer.Add(m_blackboard);
+            m_leftPanelSplitView.Add(m_inspectorContainer);
 
             m_graphicView = new GraphicView();
             m_graphicView.name = "GraphicView";

@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using NPBehave;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using UnityEngine;
 
 namespace NPSerialization
 {
@@ -39,6 +40,8 @@ namespace NPSerialization
         {
             m_ID = id;
         }
+
+        public Vector2 m_position;
 
         public virtual Node GetNode() => null;
 
