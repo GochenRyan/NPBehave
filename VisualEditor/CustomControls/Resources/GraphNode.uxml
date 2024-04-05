@@ -6,8 +6,10 @@
             <ui:VisualElement name="top" style="flex-grow: 0; flex-shrink: 1; flex-direction: column;">
                 <ui:VisualElement name="input" style="flex-grow: 1; flex-shrink: 0; padding-top: 4px; padding-bottom: 4px; align-items: center; background-color: rgb(63, 63, 63); justify-content: center;" />
                 <ui:VisualElement name="divider" style="border-bottom-width: 1px; height: 0.1px; border-left-color: rgb(31, 31, 31); border-right-color: rgb(31, 31, 31); border-top-color: rgb(31, 31, 31); border-bottom-color: rgb(31, 31, 31);" />
-                <ui:VisualElement name="title" style="height: 20px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
-                    <ui:Label text="Node Name" display-tooltip-when-elided="true" name="title-label" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; align-items: stretch; -unity-text-align: middle-center; -unity-font-style: bold; font-size: 14px; margin-top: 0; margin-right: 0; margin-left: 0;" />
+                <ui:VisualElement name="title" style="height: 38px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
+                    <ui:Label text="Title" display-tooltip-when-elided="true" name="title-label" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; align-items: stretch; -unity-text-align: middle-center; -unity-font-style: bold; font-size: 14px; margin-top: 0; margin-right: 0; margin-left: 0;" />
+                    <ui:VisualElement name="divider" style="border-bottom-width: 1px; height: 0.1px; border-left-color: rgb(31, 31, 31); border-right-color: rgb(31, 31, 31); border-top-color: rgb(31, 31, 31); border-bottom-color: rgb(31, 31, 31);" />
+                    <ui:Label text="Sub Title" display-tooltip-when-elided="true" name="subtitle-label" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; align-items: stretch; -unity-text-align: middle-center; -unity-font-style: bold; font-size: 8px; margin-top: 0; margin-right: 0; margin-left: 0; height: 13px; color: rgb(255, 108, 8);" />
                     <ui:VisualElement name="title-button-container">
                         <ui:VisualElement name="collapse-button">
                             <ui:VisualElement name="icon" />

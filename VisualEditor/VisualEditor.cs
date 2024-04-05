@@ -74,6 +74,11 @@ public class VisualEditor : EditorWindow
         {
             var id = q.Dequeue();
             var node = NodeGraphicView.CreateNode(nodeDataTree.m_nodeDataDict[id].m_position);
+
+            node.title = nodeDataTree.m_nodeDataDict[id].GetType().Name.Replace("Data", "");
+            node.Description = nodeDataTree.m_nodeDataDict[id].m_description;
+            node.SubTitle = NodeDataUtils.GetSubTitle(nodeDataTree.m_nodeDataDict[id]);
+
             ID2GraphNode.Add(id, node);
 
             IList<long> linkedNodeIDs = nodeDataTree.m_nodeDataDict[id].m_linkedNodeIDs;
@@ -93,8 +98,7 @@ public class VisualEditor : EditorWindow
         }
 
         NodeGraphicView.RootNode = ID2GraphNode[nodeDataTree.m_rootID];
-
-        //GraphicUtils.OptimizeTreeLayout(NodeGraphicView.RootNode);
+        GraphicUtils.OptimizeTreeLayout(NodeGraphicView.RootNode);
     }
 
     public Dictionary<long, GraphNode> ID2GraphNode { get; private set; } = new();

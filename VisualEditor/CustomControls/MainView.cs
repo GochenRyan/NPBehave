@@ -64,8 +64,6 @@ namespace NPVisualEditor
             m_leftPanel.Add(m_leftPanelSplitView);
         }
 
-
-
         private VisualElement m_leftPanel;
         private VisualElement m_rightPanel;
         private TwoPaneSplitView m_leftPanelSplitView;

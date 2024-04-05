@@ -44,8 +44,8 @@ namespace NPVisualEditor
 
         public GraphNode CreateNode(Vector2 position)
         {
-            GraphNode node = new GraphNode();
-            node.SetPosition(new Rect(position, DEFAULT_NODE_SIZE));
+            GraphNode node = new();
+            node.SetPosition(new Rect(position, GraphicUtils.DEFAULT_NODE_SIZE));
             AddElement(node);
             return node;
         }
@@ -56,8 +56,6 @@ namespace NPVisualEditor
             DeleteElements(this.Query<Edge>().ToList());
             RootNode = null;
         }
-
-        public readonly Vector2 DEFAULT_NODE_SIZE = new(150, 200);
         public GraphNode RootNode { get; set; } = null;
     }
 }

@@ -29,5 +29,22 @@ namespace NPSerialization
                     break;
             }
         }
+
+        public object GetValue()
+        {
+            switch (m_compareType)
+            {
+                case CompareType.TString:
+                    return this.m_theStringValue;
+                case CompareType.TFloat:
+                    return this.m_theFloatValue;
+                case CompareType.TInt:
+                    return this.m_theIntValue;
+                case CompareType.TBoolean:
+                    return this.m_theBoolValue;
+                default: 
+                    return null;
+            }
+        }
     }
 }
