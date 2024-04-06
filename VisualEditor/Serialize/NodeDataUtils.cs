@@ -1,4 +1,8 @@
 using NPBehave;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace NPSerialization
 { 
@@ -81,6 +85,30 @@ namespace NPSerialization
             }
 
             return subTitle;
+        }
+
+        public static Dictionary<NodeType, List<Type>> GetNodeDataTypeMap()
+        {
+            var nodeDataTypeMap = new Dictionary<NodeType, List<Type>>();
+
+            var nodeDataTypes = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(NodeData)));
+
+            foreach (var type in nodeDataTypes)
+            {
+                var instance = Activator.CreateInstance(type) as NodeData;
+                NodeType nodeType = instance.m_nodeType;
+                if (nodeDataTypeMap.ContainsKey(nodeType))
+                {
+                    nodeDataTypeMap[nodeType].Add(type);
+                }
+                else
+                {
+                    nodeDataTypeMap.Add(nodeType, new List<Type>() { type });
+                }
+            }
+
+            return nodeDataTypeMap;
         }
     }
 }

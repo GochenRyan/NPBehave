@@ -35,6 +35,8 @@ public class VisualEditor : EditorWindow
 
         var openBtn = rootVisualElement.Q<Button>("open");
         openBtn.RegisterCallback<MouseUpEvent>((evt) => Open());
+
+
     }
 
     private void Open()
