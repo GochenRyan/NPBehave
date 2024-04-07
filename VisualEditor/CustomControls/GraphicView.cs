@@ -30,49 +30,6 @@ namespace NPVisualEditor
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (evt.target is GraphView || evt.target is Node || evt.target is Group)
-            {
-                evt.menu.AppendAction("Cut", delegate
-                {
-                    CutSelectionCallback();
-                }, (DropdownMenuAction a) => canCutSelection ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            }
-
-            if (evt.target is GraphView || evt.target is Node || evt.target is Group)
-            {
-                evt.menu.AppendAction("Copy", delegate
-                {
-                    CopySelectionCallback();
-                }, (DropdownMenuAction a) => canCopySelection ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            }
-
-            if (evt.target is GraphView)
-            {
-                evt.menu.AppendAction("Paste", delegate
-                {
-                    PasteCallback();
-                }, (DropdownMenuAction a) => canPaste ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            }
-
-            if (evt.target is GraphView || evt.target is Node || evt.target is Group || evt.target is Edge)
-            {
-                evt.menu.AppendSeparator();
-                evt.menu.AppendAction("Delete", delegate
-                {
-                    DeleteSelectionCallback(AskUser.DontAskUser);
-                }, (DropdownMenuAction a) => canDeleteSelection ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            }
-
-            if (evt.target is GraphView || evt.target is Node || evt.target is Group)
-            {
-                evt.menu.AppendSeparator();
-                evt.menu.AppendAction("Duplicate", delegate
-                {
-                    DuplicateSelectionCallback();
-                }, (DropdownMenuAction a) => canDuplicateSelection ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-                evt.menu.AppendSeparator();
-            }
-
             if (evt.target is GraphView)
             {
                 evt.menu.AppendSeparator();
@@ -102,6 +59,22 @@ namespace NPVisualEditor
                         }
                 }
                 evt.menu.AppendSeparator();
+
+                evt.menu.AppendAction("Optimize Layout",
+                    (DropdownMenuAction dropdownMenuAction) =>
+                    {
+                        GraphicUtils.OptimizeTreeLayout(this.RootNode);
+                    }, (DropdownMenuAction dropdownMenuAction) =>
+                    {
+                        if (this.RootNode != null)
+                        {
+                            return DropdownMenuAction.Status.Normal;
+                        }
+                        else
+                        {
+                            return DropdownMenuAction.Status.Disabled;
+                        }
+                    });
             }
         }
 

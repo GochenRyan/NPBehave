@@ -1,5 +1,6 @@
 using NPSerialization;
 using NPVisualEditor;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -31,12 +32,11 @@ public class VisualEditor : EditorWindow
         TemplateContainer blackboardViewInstance = blackboardViewTree.CloneTree();
         BlackboardPanel.Add(blackboardViewInstance);
 
-        NodeGraphicView = rootVisualElement.Q<GraphicView>("GraphicView");
+         InspectorView = rootVisualElement.Q<ScrollView>("Inspector");
 
+        NodeGraphicView = rootVisualElement.Q<GraphicView>("GraphicView");
         var openBtn = rootVisualElement.Q<Button>("open");
         openBtn.RegisterCallback<MouseUpEvent>((evt) => Open());
-
-
     }
 
     private void Open()
@@ -56,6 +56,7 @@ public class VisualEditor : EditorWindow
         {
             nodeDataTree.CreateTreeByNodeData();
             CreateNodeGraphByData(nodeDataTree);
+            m_tmpNodeDataTree = nodeDataTree;
         }
     }
 
@@ -77,10 +78,11 @@ public class VisualEditor : EditorWindow
             var id = q.Dequeue();
             var node = NodeGraphicView.CreateNode(nodeDataTree.m_nodeDataDict[id].m_position);
 
+            node.ID = id;
             node.title = nodeDataTree.m_nodeDataDict[id].GetType().Name.Replace("Data", "");
             node.Description = nodeDataTree.m_nodeDataDict[id].m_description;
             node.SubTitle = NodeDataUtils.GetSubTitle(nodeDataTree.m_nodeDataDict[id]);
-
+            node.SelectedCB += OnSelectedNode;
             ID2GraphNode.Add(id, node);
 
             IList<long> linkedNodeIDs = nodeDataTree.m_nodeDataDict[id].m_linkedNodeIDs;
@@ -103,7 +105,60 @@ public class VisualEditor : EditorWindow
         GraphicUtils.OptimizeTreeLayout(NodeGraphicView.RootNode);
     }
 
+    private void OnSelectedNode(object sender, EventArgs args)
+    {
+        InspectorView.Clear();
+        GraphNode node = (GraphNode)sender;
+        if (node != null)
+        {
+            long id = node.ID;
+            if (m_tmpNodeDataTree.m_nodeDataDict.TryGetValue(id, out NodeData nodeData))
+            {
+                var idField = new LongField("ID");
+                idField.SetEnabled(false);
+                idField.value = id;
+                InspectorView.Add(idField);
+
+                var nodeTypeField = new TextField("Type");
+                nodeTypeField.value = nodeData.m_nodeType.ToString();
+                nodeTypeField.SetEnabled(false);
+                InspectorView.Add(nodeTypeField);
+
+                var nodeNameField = new TextField("Name");
+                nodeNameField.value = nodeData.TYPE_NAME_FOR_SERIALIZATION;
+                nodeNameField.SetEnabled(false);
+                InspectorView.Add(nodeNameField);
+
+                var nodeDescField = new TextField("Description");
+                nodeDescField.value = nodeData.m_description;
+                nodeDescField.RegisterCallback<FocusOutEvent>((evt) =>
+                {
+                    if (!string.IsNullOrEmpty(nodeDescField.value))
+                        nodeData.m_description = nodeDescField.value;
+                });
+                InspectorView.Add(nodeDescField);
+
+                BuildFieldsByNodeType(nodeData);
+            }
+        }
+    }
+
+    private void BuildFieldsByNodeType(NodeData nodeData)
+    {
+        switch (nodeData.m_nodeType)
+        {
+            case NodeType.Composite:
+                break;
+            case NodeType.Decorator:
+                break;
+            case NodeType.Task:
+                break;
+        }
+    }
+
     public Dictionary<long, GraphNode> ID2GraphNode { get; private set; } = new();
     public VisualElement BlackboardPanel { get; private set; }
     public GraphicView NodeGraphicView { get; private set; }
+    public ScrollView InspectorView { get; private set; }
+    private NodeDataTree m_tmpNodeDataTree = null;
 }

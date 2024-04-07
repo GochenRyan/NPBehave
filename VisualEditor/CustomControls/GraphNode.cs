@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -58,10 +59,27 @@ namespace NPVisualEditor
             }
         }
 
+        public long ID { get; set; }
+
+        public override void OnSelected()
+        {
+            base.OnSelected();
+            SelectedCB?.Invoke(this, EventArgs.Empty);
+        }
+
+        public override void OnUnselected()
+        {
+            base.OnUnselected();
+            UnselectedCB?.Invoke(this, EventArgs.Empty);
+        }
+
         Port m_parentPort;
         Port m_childrenPort;
 
         private readonly Label m_descLabel;
         private readonly Label m_subTitleLabel;
+
+        public event EventHandler SelectedCB;
+        public event EventHandler UnselectedCB;
     }
 }

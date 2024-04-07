@@ -13,9 +13,27 @@ namespace NPVisualEditor
         {
             IList<IList<GraphNode>> nodeLayers;
 
+            ResetNodePosition(node);
             InitLayer(node, out nodeLayers);
             LayoutChild(node);
             LayoutOverlaps(nodeLayers);
+        }
+
+        private static void ResetNodePosition(GraphNode node)
+        {
+            Queue<GraphNode> queue = new Queue<GraphNode>();
+            queue.Enqueue(node);
+
+            while (queue.Count > 0)
+            {
+                var curNode = queue.Dequeue();
+                SetPosition(curNode, new Vector2(0, 0));
+
+                foreach (var child in GetChildren(curNode))
+                {
+                    queue.Enqueue(child);
+                }
+            }
         }
 
         private static void InitLayer(GraphNode node, out IList<IList<GraphNode>> nodeLayers)
