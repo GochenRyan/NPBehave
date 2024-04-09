@@ -20,7 +20,6 @@ namespace NPSerialization
         [JsonIgnore]
         public Func<Request, Result> m_multiFrameFunc2;
 
-
         public string ActionString
         {
             get

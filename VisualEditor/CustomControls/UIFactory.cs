@@ -1,7 +1,10 @@
+using NPSerialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.XR;
 
 namespace NPVisualEditor
 {
@@ -37,12 +40,50 @@ namespace NPVisualEditor
                     value = (long)fieldInfo.GetValue(obj)
                 };
             }
+            else if (type == typeof(float))
+            {
+                element = new FloatField(label)
+                {
+                    value = (float)fieldInfo.GetValue(obj)
+                };
+            }
             else if (type == typeof(string))
             {
                 element = new TextField(label)
                 {
                     value = (string)fieldInfo.GetValue(obj)
                 };
+            }
+            else if (type.IsEnum) 
+            {
+                element = new EnumField(label, (Enum)fieldInfo.GetValue(obj));
+            }
+            else if (type == typeof(DelegateData))
+            {
+                DelegateData delegateData = (DelegateData)fieldInfo.GetValue(obj);
+                string funcName = string.Empty;
+                if (delegateData.m_action != null) 
+                {
+                    funcName = delegateData.m_action.Method.Name;
+                }
+                else if (delegateData.m_singleFrameFunc != null)
+                {
+                    funcName = delegateData.m_singleFrameFunc.Method.Name;
+                }
+                else if (delegateData.m_multiFrameFunc != null)
+                {
+                    funcName = delegateData.m_multiFrameFunc.Method.Name;
+                }
+                else if (delegateData.m_multiFrameFunc2 != null)
+                {
+                    funcName = delegateData.m_multiFrameFunc2.Method.Name;
+                }
+                // TODO: Function Collection
+                var funcList = new List<string>() 
+                {
+                    funcName
+                };
+                element = new DropdownField(label, funcList, 0);
             }
 
             // TODO: Enum
