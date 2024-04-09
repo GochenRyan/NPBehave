@@ -114,45 +114,36 @@ public class VisualEditor : EditorWindow
             long id = node.ID;
             if (m_tmpNodeDataTree.m_nodeDataDict.TryGetValue(id, out NodeData nodeData))
             {
-                var idField = new LongField("ID");
-                idField.SetEnabled(false);
-                idField.value = id;
-                InspectorView.Add(idField);
+                //var idField = new LongField("ID");
+                //idField.SetEnabled(false);
+                //idField.value = id;
+                //InspectorView.Add(idField);
 
-                var nodeTypeField = new TextField("Type");
-                nodeTypeField.value = nodeData.m_nodeType.ToString();
-                nodeTypeField.SetEnabled(false);
-                InspectorView.Add(nodeTypeField);
+                //var nodeTypeField = new TextField("Type");
+                //nodeTypeField.value = nodeData.m_nodeType.ToString();
+                //nodeTypeField.SetEnabled(false);
+                //InspectorView.Add(nodeTypeField);
 
-                var nodeNameField = new TextField("Name");
-                nodeNameField.value = nodeData.TYPE_NAME_FOR_SERIALIZATION;
-                nodeNameField.SetEnabled(false);
-                InspectorView.Add(nodeNameField);
+                //var nodeNameField = new TextField("Name");
+                //nodeNameField.value = nodeData.TYPE_NAME_FOR_SERIALIZATION;
+                //nodeNameField.SetEnabled(false);
+                //InspectorView.Add(nodeNameField);
 
-                var nodeDescField = new TextField("Description");
-                nodeDescField.value = nodeData.m_description;
-                nodeDescField.RegisterCallback<FocusOutEvent>((evt) =>
+                //var nodeDescField = new TextField("Description");
+                //nodeDescField.value = nodeData.m_description;
+                //nodeDescField.RegisterCallback<FocusOutEvent>((evt) =>
+                //{
+                //    if (!string.IsNullOrEmpty(nodeDescField.value))
+                //        nodeData.m_description = nodeDescField.value;
+                //});
+                //InspectorView.Add(nodeDescField);
+
+                var elements = UIFactory.CreateElements(nodeData);
+                foreach (var element in elements)
                 {
-                    if (!string.IsNullOrEmpty(nodeDescField.value))
-                        nodeData.m_description = nodeDescField.value;
-                });
-                InspectorView.Add(nodeDescField);
-
-                BuildFieldsByNodeType(nodeData);
+                    InspectorView.Add(element);
+                }
             }
-        }
-    }
-
-    private void BuildFieldsByNodeType(NodeData nodeData)
-    {
-        switch (nodeData.m_nodeType)
-        {
-            case NodeType.Composite:
-                break;
-            case NodeType.Decorator:
-                break;
-            case NodeType.Task:
-                break;
         }
     }
 
