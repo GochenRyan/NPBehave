@@ -162,5 +162,28 @@ namespace NPSerialization
                 return (T)Delegate.CreateDelegate(typeof(T), method);
             }
         }
+    
+        public string GetMethodName()
+        {
+            string funcName = string.Empty;
+            if (m_action != null)
+            {
+                funcName = GetSerializeString(m_action);
+            }
+            else if (m_singleFrameFunc != null)
+            {
+                funcName = GetSerializeString(m_singleFrameFunc);
+            }
+            else if (m_multiFrameFunc != null)
+            {
+                funcName = GetSerializeString(m_multiFrameFunc);
+            }
+            else if (m_multiFrameFunc2 != null)
+            {
+                funcName = GetSerializeString(m_multiFrameFunc2);
+            }
+
+            return funcName;
+        }
     }
 }

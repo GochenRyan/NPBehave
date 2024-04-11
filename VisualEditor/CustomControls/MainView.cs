@@ -20,7 +20,7 @@ namespace NPVisualEditor
 
             m_leftPanel = new VisualElement();
             m_leftPanel.name = "LeftPanel";
-            m_leftPanel.style.minWidth = 400.0f;
+            m_leftPanel.style.minWidth = 600.0f;
             this.Add(m_leftPanel);
 
             m_rightPanel = new VisualElement();

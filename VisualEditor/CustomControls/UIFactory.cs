@@ -2,6 +2,7 @@ using NPSerialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.XR;
@@ -60,33 +61,41 @@ namespace NPVisualEditor
             }
             else if (type == typeof(DelegateData))
             {
+                element = new VisualElement();
+                element.style.borderBottomWidth = 1;
+                element.style.borderBottomColor = Color.yellow;
+                element.style.borderTopWidth = 1;
+                element.style.borderTopColor = Color.yellow;
+
+                element.style.flexDirection = FlexDirection.Column;
+                var methodContanier = new VisualElement();
+                methodContanier.style.flexDirection = FlexDirection.Row;
+
                 DelegateData delegateData = (DelegateData)fieldInfo.GetValue(obj);
-                string funcName = string.Empty;
-                if (delegateData.m_action != null) 
+                string funcName = delegateData.GetMethodName();
+                var funcElement = new TextField(label)
                 {
-                    funcName = delegateData.m_action.Method.Name;
-                }
-                else if (delegateData.m_singleFrameFunc != null)
-                {
-                    funcName = delegateData.m_singleFrameFunc.Method.Name;
-                }
-                else if (delegateData.m_multiFrameFunc != null)
-                {
-                    funcName = delegateData.m_multiFrameFunc.Method.Name;
-                }
-                else if (delegateData.m_multiFrameFunc2 != null)
-                {
-                    funcName = delegateData.m_multiFrameFunc2.Method.Name;
-                }
-                // TODO: Function Collection
-                var funcList = new List<string>() 
-                {
-                    funcName
+                    value = funcName
                 };
-                element = new DropdownField(label, funcList, 0);
+                var objectField = new ObjectField("New Method");
+                var dropdownField = new DropdownField();
+                objectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(selectedObject => {
+                    List<string> funcList = new();
+                    var methods = selectedObject.GetType().GetMethods();
+                    foreach (var method in methods)
+                    {
+                        funcList.Add(method.Name);
+                    }
+                    dropdownField.choices = funcList;
+                });
+                
+                methodContanier.Add(objectField);
+                methodContanier.Add(dropdownField);
+
+                element.Add(funcElement);
+                element.Add(methodContanier);
             }
 
-            // TODO: Enum
 
             if (element != null)
             {
