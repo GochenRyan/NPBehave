@@ -1,4 +1,3 @@
-using NPBehave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +9,9 @@ namespace NPSerialization
     {
         public static void AddChild(NodeData parent, NodeData child)
         {
+            if (parent == null || child == null)
+                return;
+
             if (!parent.m_linkedNodeIDs.Contains(child.m_ID))
             {
                 parent.m_linkedNodeIDs.Add(child.m_ID);
@@ -19,6 +21,9 @@ namespace NPSerialization
 
         public static void AddChildren(NodeData parent, params NodeData[] children)
         {
+            if (parent == null)
+                return;
+
             foreach (NodeData child in children)
             {
                 if (!parent.m_linkedNodeIDs.Contains(child.m_ID))
@@ -26,6 +31,33 @@ namespace NPSerialization
                     parent.m_linkedNodeIDs.Add(child.m_ID);
                 }
                 child.m_parentID = parent.m_ID;
+            }
+        }
+
+        public static void RemoveChild(NodeData parent, NodeData child)
+        {
+            if (parent == null || child == null)
+                return;
+
+            if (parent.m_linkedNodeIDs.Contains(child.m_ID))
+            {
+                parent.m_linkedNodeIDs.Remove(child.m_ID);
+            }
+            child.m_parentID = 0;
+        }
+
+        public static void RemoveChildren(NodeData parent, params NodeData[] children)
+        {
+            if (parent == null)
+                return;
+
+            foreach (NodeData child in children)
+            {
+                if (parent.m_linkedNodeIDs.Contains(child.m_ID))
+                {
+                    parent.m_linkedNodeIDs.Remove(child.m_ID);
+                }
+                child.m_parentID = 0;
             }
         }
 
@@ -60,22 +92,7 @@ namespace NPSerialization
                     if (typeof(ActionData).FullName == nodeData.TYPE_NAME_FOR_SERIALIZATION)
                     {
                         var actionData = nodeData as ActionData;
-                        if (actionData.m_actionData.m_action != null)
-                        {
-                            subTitle = actionData.m_actionData.m_action.Method.Name;
-                        }
-                        else if (actionData.m_actionData.m_singleFrameFunc != null)
-                        {
-                            subTitle = actionData.m_actionData.m_singleFrameFunc.Method.Name;
-                        }
-                        else if (actionData.m_actionData.m_multiFrameFunc != null)
-                        {
-                            subTitle = actionData.m_actionData.m_multiFrameFunc.Method.Name;
-                        }
-                        else if (actionData.m_actionData.m_multiFrameFunc2 != null)
-                        {
-                            subTitle = actionData.m_actionData.m_multiFrameFunc2.Method.Name;
-                        }
+                        subTitle = actionData.m_actionData.GetMethodName();
                     }
                     else
                     {
@@ -109,6 +126,87 @@ namespace NPSerialization
             }
 
             return nodeDataTypeMap;
+        }
+
+        public static bool CheckSerializationID(Type type)
+        {
+            object[] attributes = type.GetCustomAttributes(typeof(SerializationIDAttribute), false);
+
+            return attributes.Length > 0;
+        }
+
+        public static List<MethodInfo> GetNPTaskMethods(Type type, BindingFlags flags)
+        {
+            List<MethodInfo> taskMethods = new List<MethodInfo>();
+
+            // Action
+            taskMethods.AddRange(GetMethodsWithSignature(type, flags, typeof(void), null));
+
+            // Func<bool>
+            taskMethods.AddRange(GetMethodsWithSignature(type, flags, typeof(bool), null));
+
+            // Func<bool, Result>
+            taskMethods.AddRange(GetMethodsWithSignature(type, flags, typeof(NPBehave.Action.Result), typeof(bool)));
+
+            // Func<Request, Result>
+            taskMethods.AddRange(GetMethodsWithSignature(type, flags, typeof(NPBehave.Action.Result), typeof(NPBehave.Action.Request)));
+
+            return taskMethods;
+        }
+
+        public static List<MethodInfo> GetMethodsWithSignature(Type type, BindingFlags flags, Type returnType, params Type[] parameterTypes)
+        {
+            MethodInfo[] methods = type.GetMethods(flags);
+
+            List<MethodInfo> filteredMethods = methods.Where(method =>
+                method.ReturnType == returnType &&
+                (parameterTypes == null && method.GetParameters().Length == 0) || 
+                (parameterTypes != null && method.GetParameters().Select(p => p.ParameterType).SequenceEqual(parameterTypes))
+            ).ToList();
+
+            return filteredMethods;
+        }
+
+        public static string GetSerializeString(MethodInfo methodInfo)
+        {
+            if (methodInfo == null)
+                return null;
+
+            if (methodInfo.ReflectedType == null)
+                return null;
+
+            if (methodInfo.IsStatic)
+            {
+                return $"{methodInfo.ReflectedType.FullName}|{methodInfo.Name}";
+            }
+            else
+            {
+                Type type = methodInfo.ReflectedType;
+                ParameterInfo[] parameters = methodInfo.GetParameters();
+
+                if (parameters.Length == 0)
+                    return null;
+
+                long IDObject = 0;
+
+                object[] attributes = type.GetCustomAttributes(typeof(SerializationIDAttribute), false);
+
+                foreach (var attribute in attributes)
+                {
+                    if (attribute is SerializationIDAttribute serializationID)
+                    {
+                        IDObject = serializationID.ID;
+                        break;
+                    }
+                }
+
+                if (IDObject == 0)
+                {
+                    return null;
+                }
+
+                return $"{type.FullName}|{IDObject}|{methodInfo.Name}";
+            }
         }
     }
 }

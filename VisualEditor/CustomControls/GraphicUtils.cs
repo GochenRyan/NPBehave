@@ -1,4 +1,5 @@
 using NPBehave;
+using NPSerialization;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
@@ -9,6 +10,18 @@ namespace NPVisualEditor
 {
     public static class GraphicUtils
     {
+        public static void UpdateGraphNode(GraphNode node)
+        {
+            NodeData nodeData = node.Data as NodeData;
+            if (nodeData == null)
+                return;
+
+            node.ID = nodeData.m_ID;
+            node.title = nodeData.GetType().Name.Replace("Data", "");
+            node.Description = nodeData.m_description;
+            node.SubTitle = NodeDataUtils.GetSubTitle(nodeData);
+        }
+
         public static void OptimizeTreeLayout(GraphNode node)
         {
             IList<IList<GraphNode>> nodeLayers;

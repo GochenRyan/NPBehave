@@ -10,15 +10,21 @@ namespace NPSerialization
     {
         [JsonIgnore]
         public Action m_action;
-
         [JsonIgnore]
         public Func<bool> m_singleFrameFunc;
-
         [JsonIgnore]
         public Func<bool, Result> m_multiFrameFunc;
-
         [JsonIgnore]
         public Func<Request, Result> m_multiFrameFunc2;
+
+        [JsonIgnore]
+        public string m_actionName = string.Empty;
+        [JsonIgnore]
+        public string m_singleFrameFuncName = string.Empty;
+        [JsonIgnore]
+        public string m_multiFrameFuncName = string.Empty;
+        [JsonIgnore]
+        public string m_multiFrameFunc2Name = string.Empty;
 
         public string ActionString
         {
@@ -88,13 +94,14 @@ namespace NPSerialization
                     return null;
 
                 Type type = instance.GetType();
-                var fields = type.GetFields();
                 long IDObject = 0;
-                foreach (var field in fields)
+                object[] attributes = type.GetCustomAttributes(typeof(SerializationIDAttribute), false);
+
+                foreach (var attribute in attributes)
                 {
-                    if (Attribute.IsDefined(field, typeof(SerializationIDAttribute)))
+                    if (attribute is SerializationIDAttribute serializationID)
                     {
-                        IDObject = Convert.ToInt64(field.GetValue(instance));
+                        IDObject = serializationID.ID;
                         break;
                     }
                 }
@@ -149,7 +156,6 @@ namespace NPSerialization
 
                 if (!method.IsStatic)
                 {
-                    var fields = type.GetFields();
                     object instance;
                     if (ID == 0 || !InstanceContext.Instance.TryGetReference(type, ID, out instance))
                     {
@@ -184,6 +190,77 @@ namespace NPSerialization
             }
 
             return funcName;
+        }
+    
+        public bool ResetMethod(string methodString)
+        {
+            string[] parts = methodString.Split('|');
+            if (parts.Length != 3 && parts.Length != 2)
+                return false;
+
+            string typeName;
+            string methodName;
+            MethodInfo methodInfo = null;
+            if (parts.Length == 2)
+            {
+                typeName = parts[0];
+                methodName = parts[1];
+            }
+            else
+            {
+                typeName = parts[0];
+                methodName = parts[2];
+            }
+
+            Type type = Type.GetType(typeName);
+            if (type == null)
+                return false;
+
+            methodInfo = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            if (methodInfo == null)
+                return false;
+
+            Type[] parameterTypes = methodInfo.GetParameters().Select(p => p.ParameterType).ToArray();
+            if (methodInfo.ReturnType == typeof(void))
+            {
+                if (parameterTypes.Length == 0)
+                {
+                    Clear();
+                    ActionString = methodString;
+                    return true;
+                }
+                else if (parameterTypes.Length == 1 && parameterTypes[0] == typeof(bool))
+                {
+                    Clear();
+                    SingleFrameFuncString = methodString;
+                    return true;
+                }
+            }
+            else if (methodInfo.ReturnType == typeof(Result))
+            {
+                if (parameterTypes.Length == 1 && parameterTypes[0] == typeof(bool))
+                {
+                    Clear();
+                    MultiFrameFuncString = methodString;
+                    return true;
+                }
+                else if (parameterTypes.Length == 1 && parameterTypes[0] == typeof(Request))
+                {
+                    Clear();
+                    MultiFrameFunc2String = methodString;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void Clear()
+        {
+            m_action = null;
+            m_singleFrameFunc = null;
+            m_multiFrameFunc = null;
+            m_multiFrameFunc2 = null;
         }
     }
 }

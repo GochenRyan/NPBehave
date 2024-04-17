@@ -2,11 +2,14 @@ using System;
 
 namespace NPSerialization
 {
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Class)]
     public class SerializationIDAttribute : Attribute
     {
-        public SerializationIDAttribute()
+        public long ID { get; }
+
+        public SerializationIDAttribute(long id)
         {
+            ID = id;
         }
     }
 }

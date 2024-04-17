@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 namespace NPVisualEditor_Example
 {
+    [SerializationID(1001)]
     public class VisualEditorExampleSerialize : MonoBehaviour
     {
         private void Start()
@@ -129,6 +130,11 @@ namespace NPVisualEditor_Example
                 m_id++;
                 return m_id; 
             }
+        }
+
+        private bool AlwaysTrue()
+        {
+            return true;
         }
 
         private NodeDataTree m_nodeDataTree;

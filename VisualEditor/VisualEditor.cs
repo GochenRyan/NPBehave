@@ -3,6 +3,7 @@ using NPVisualEditor;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -35,8 +36,37 @@ public class VisualEditor : EditorWindow
          InspectorView = rootVisualElement.Q<ScrollView>("Inspector");
 
         NodeGraphicView = rootVisualElement.Q<GraphicView>("GraphicView");
+        NodeGraphicView.ManualAddNode += OnManualAddNode;
+        NodeGraphicView.ManualRemoveNodes += OnManualRemoveNodes;
+
         var openBtn = rootVisualElement.Q<Button>("open");
         openBtn.RegisterCallback<MouseUpEvent>((evt) => Open());
+    }
+
+    private void OnManualRemoveNodes(IList<GraphNode> list)
+    {
+        if (m_tmpNodeDataTree == null)
+            return;
+
+        foreach (GraphNode node in list)
+        {
+            if (node.Data != null && m_tmpNodeDataTree.m_nodeDataDict.ContainsKey(node.Data.m_ID))
+            {
+                m_tmpNodeDataTree.m_nodeDataDict.Remove(node.Data.m_ID);
+            }
+        }
+    }
+
+    private void OnManualAddNode(GraphNode node)
+    {
+        if (m_tmpNodeDataTree == null || node.Data == null)
+            return;
+
+        node.Data.m_ID = GenerateID();
+        node.ID = node.Data.m_ID;
+        node.SelectedCB += OnSelectedNode;
+
+        m_tmpNodeDataTree.m_nodeDataDict[node.Data.m_ID] = node.Data;
     }
 
     private void Open()
@@ -54,7 +84,6 @@ public class VisualEditor : EditorWindow
 
         if (nodeDataTree != null)
         {
-            nodeDataTree.CreateTreeByNodeData();
             CreateNodeGraphByData(nodeDataTree);
             m_tmpNodeDataTree = nodeDataTree;
         }
@@ -78,10 +107,8 @@ public class VisualEditor : EditorWindow
             var id = q.Dequeue();
             var node = NodeGraphicView.CreateNode(nodeDataTree.m_nodeDataDict[id].m_position);
 
-            node.ID = id;
-            node.title = nodeDataTree.m_nodeDataDict[id].GetType().Name.Replace("Data", "");
-            node.Description = nodeDataTree.m_nodeDataDict[id].m_description;
-            node.SubTitle = NodeDataUtils.GetSubTitle(nodeDataTree.m_nodeDataDict[id]);
+            node.Data = nodeDataTree.m_nodeDataDict[id];
+            GraphicUtils.UpdateGraphNode(node);
             node.SelectedCB += OnSelectedNode;
             ID2GraphNode.Add(id, node);
 
@@ -114,37 +141,23 @@ public class VisualEditor : EditorWindow
             long id = node.ID;
             if (m_tmpNodeDataTree.m_nodeDataDict.TryGetValue(id, out NodeData nodeData))
             {
-                //var idField = new LongField("ID");
-                //idField.SetEnabled(false);
-                //idField.value = id;
-                //InspectorView.Add(idField);
-
-                //var nodeTypeField = new TextField("Type");
-                //nodeTypeField.value = nodeData.m_nodeType.ToString();
-                //nodeTypeField.SetEnabled(false);
-                //InspectorView.Add(nodeTypeField);
-
-                //var nodeNameField = new TextField("Name");
-                //nodeNameField.value = nodeData.TYPE_NAME_FOR_SERIALIZATION;
-                //nodeNameField.SetEnabled(false);
-                //InspectorView.Add(nodeNameField);
-
-                //var nodeDescField = new TextField("Description");
-                //nodeDescField.value = nodeData.m_description;
-                //nodeDescField.RegisterCallback<FocusOutEvent>((evt) =>
-                //{
-                //    if (!string.IsNullOrEmpty(nodeDescField.value))
-                //        nodeData.m_description = nodeDescField.value;
-                //});
-                //InspectorView.Add(nodeDescField);
-
-                var elements = UIFactory.CreateElements(nodeData);
+                var elements = UIFactory.CreateElements(node, nodeData);
                 foreach (var element in elements)
                 {
                     InspectorView.Add(element);
                 }
             }
         }
+    }
+
+    private long GenerateID()
+    {
+        if (m_tmpNodeDataTree == null)
+            return 0;
+
+        long maxID = m_tmpNodeDataTree.m_nodeDataDict.Keys.Max();
+
+        return maxID + 1;
     }
 
     public Dictionary<long, GraphNode> ID2GraphNode { get; private set; } = new();

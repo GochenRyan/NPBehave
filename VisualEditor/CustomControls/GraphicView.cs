@@ -1,6 +1,7 @@
 using NPSerialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -19,13 +20,6 @@ namespace NPVisualEditor
             this.AddManipulator(new RectangleSelector());
             var grid = new GridBackground();
             Insert(0, grid);
-
-            nodeCreationRequest = CreateNode;
-        }
-
-        private void CreateNode(NodeCreationContext nodeCreationContext)
-        {
-
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -51,6 +45,9 @@ namespace NPVisualEditor
                                     graphNode.title = nodeClsType.Name.Replace("Data", "");
                                     graphNode.Description = "";
                                     graphNode.SubTitle = NodeDataUtils.GetSubTitle(instance);
+                                    graphNode.Data = instance;
+
+                                    ManualAddNode.Invoke(graphNode);
                                 }
                                , (DropdownMenuAction dropdownMenuAction) => 
                                {
@@ -116,6 +113,46 @@ namespace NPVisualEditor
             DeleteElements(this.Query<Edge>().ToList());
             RootNode = null;
         }
+
+        public override EventPropagation DeleteSelection()
+        {
+            HashSet<GraphElement> hashSet = new HashSet<GraphElement>();
+            CollectDeletableGraphElements(selection.OfType<GraphElement>(), hashSet);
+            HashSet<GraphElement> hashSet2 = new HashSet<GraphElement>();
+            foreach (Placemat item in from p in hashSet.OfType<Placemat>()
+                                      where p.Collapsed
+                                      select p)
+            {
+                hashSet2.UnionWith(item.CollapsedElements);
+                item.Collapsed = false;
+            }
+
+            DeleteElements(hashSet);
+            selection.Clear();
+            foreach (GraphElement item2 in hashSet2)
+            {
+                AddToSelection(item2);
+            }
+
+            IList<GraphNode> nodes = new List<GraphNode>();
+            foreach (var  item3 in hashSet)
+            {
+                GraphNode graphNode = item3 as GraphNode;
+                if (graphNode != null)
+                    nodes.Add(graphNode);
+            }
+            ManualRemoveNodes?.Invoke(nodes);
+
+            return (hashSet.Count <= 0) ? EventPropagation.Continue : EventPropagation.Stop;
+        }
+
+        private void CollectDeletableGraphElements(IEnumerable<GraphElement> elements, HashSet<GraphElement> elementsToRemoveSet)
+        {
+            CollectElements(elements, elementsToRemoveSet, (GraphElement e) => (e.capabilities & Capabilities.Deletable) == Capabilities.Deletable);
+        }
+
         public GraphNode RootNode { get; set; } = null;
+        public Action<GraphNode> ManualAddNode;
+        public Action<IList<GraphNode>> ManualRemoveNodes;
     }
 }
