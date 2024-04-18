@@ -22,6 +22,11 @@ public class VisualEditor : EditorWindow
         wnd.titleContent = new GUIContent("VisualEditor");
     }
 
+    void OnDestroy()
+    {
+        // TODO: Check if data should be saved
+    }
+
     public void CreateGUI()
     {
         VisualTreeAsset visualEditor = Resources.Load<VisualTreeAsset>("VisualEditor");
@@ -59,6 +64,19 @@ public class VisualEditor : EditorWindow
             DisplayTimedMessage("Please input the name", HelpBoxMessageType.Error, 2000);
             return;
         }
+        else
+        {
+            rootVisualElement.Q<Label>("TreeName").text = name;
+            NodeDataTree nodeDataTree = new();
+            var rootData = new RootData(1);
+            nodeDataTree.m_nodeDataDict[rootData.m_ID] = rootData;
+            nodeDataTree.m_rootID = rootData.m_ID;
+
+            // TODO: Check if data should be saved
+
+            CreateNodeGraphByData(nodeDataTree);
+            m_tmpNodeDataTree = nodeDataTree;
+        }
     }
 
     private void DisplayTimedMessage(string message, HelpBoxMessageType type, float time)
@@ -86,11 +104,12 @@ public class VisualEditor : EditorWindow
     {
         if (CheckTree())
         {
+            string fileName = rootVisualElement.Q<Label>("TreeName").text;
             int option = 0;
             switch (option)
             {
                 case 0:
-                    string path = EditorUtility.SaveFilePanel("Save behavoir tree as json", Application.dataPath, "BehavoirTree.json", "json");
+                    string path = EditorUtility.SaveFilePanel("Save behavoir tree as json", Application.dataPath, fileName + ".json", "json");
                     if (path.Length != 0)
                     {
                         var jsonStream = new JsonStream();
@@ -103,6 +122,9 @@ public class VisualEditor : EditorWindow
 
     private bool CheckTree()
     {
+        if (m_tmpNodeDataTree == null)
+            return false;
+
         return true;
     }
 
@@ -136,7 +158,7 @@ public class VisualEditor : EditorWindow
     {
         string path = EditorUtility.OpenFilePanel("Select", Application.dataPath, "");
         string extension = Path.GetExtension(path);
-        rootVisualElement.Q<Label>("TreeName").text = Path.GetFileName(path);
+        rootVisualElement.Q<Label>("TreeName").text = Path.GetFileNameWithoutExtension(path);
         NodeDataTree nodeDataTree = null;
         switch (extension)
         {
