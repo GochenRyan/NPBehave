@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Timers;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -41,6 +42,68 @@ public class VisualEditor : EditorWindow
 
         var openBtn = rootVisualElement.Q<Button>("open");
         openBtn.RegisterCallback<MouseUpEvent>((evt) => Open());
+
+        var saveBtn = rootVisualElement.Q<Button>("save");
+        saveBtn.RegisterCallback<MouseUpEvent>((evt) => Save());
+
+        var newBtn = rootVisualElement.Q<Button>("new");
+        newBtn.RegisterCallback<MouseUpEvent>((evt) => New());
+    }
+
+    private void New()
+    {
+        var nameField = rootVisualElement.Q<TextField>("newbtname");
+        string name = nameField.text;
+        if (string.IsNullOrEmpty(name))
+        {
+            DisplayTimedMessage("Please input the name", HelpBoxMessageType.Error, 2000);
+            return;
+        }
+    }
+
+    private void DisplayTimedMessage(string message, HelpBoxMessageType type, float time)
+    {
+        var helpBox = new HelpBox(message, type);
+        helpBox.name = "helpBox";
+        helpBox.style.position = Position.Absolute;
+        helpBox.style.left = Length.Percent(50);
+        helpBox.style.top = Length.Percent(50);
+        rootVisualElement.Add(helpBox);
+
+        m_timer = new Timer(time);
+        m_timer.Elapsed += DelayedRemoval;
+        m_timer.AutoReset = false;
+        m_timer.Start();
+    }
+
+    private void DelayedRemoval(object sender, ElapsedEventArgs e)
+    {
+        var helpBox = rootVisualElement.Q<HelpBox>("helpBox");
+        rootVisualElement.Remove(helpBox);
+    }
+
+    private void Save()
+    {
+        if (CheckTree())
+        {
+            int option = 0;
+            switch (option)
+            {
+                case 0:
+                    string path = EditorUtility.SaveFilePanel("Save behavoir tree as json", Application.dataPath, "BehavoirTree.json", "json");
+                    if (path.Length != 0)
+                    {
+                        var jsonStream = new JsonStream();
+                        jsonStream.Save<NodeDataTree>(m_tmpNodeDataTree, path);
+                    }
+                    break;
+            }
+        }
+    }
+
+    private bool CheckTree()
+    {
+        return true;
     }
 
     private void OnManualRemoveNodes(IList<GraphNode> list)
@@ -73,6 +136,7 @@ public class VisualEditor : EditorWindow
     {
         string path = EditorUtility.OpenFilePanel("Select", Application.dataPath, "");
         string extension = Path.GetExtension(path);
+        rootVisualElement.Q<Label>("TreeName").text = Path.GetFileName(path);
         NodeDataTree nodeDataTree = null;
         switch (extension)
         {
@@ -165,4 +229,6 @@ public class VisualEditor : EditorWindow
     public GraphicView NodeGraphicView { get; private set; }
     public ScrollView InspectorView { get; private set; }
     private NodeDataTree m_tmpNodeDataTree = null;
+
+    private Timer m_timer;
 }
