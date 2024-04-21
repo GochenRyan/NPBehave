@@ -25,6 +25,9 @@ namespace NPSerialization
 
         public override Decorator CreateDecorator(Node node)
         {
+            if (!m_delegateData.IsDelegateCreated())
+                m_delegateData.CreateDelegate();
+
             if (m_delegateData.m_action == null)
                 throw new Exception("No Service Method!");
 

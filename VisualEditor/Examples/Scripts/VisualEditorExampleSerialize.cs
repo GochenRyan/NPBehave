@@ -18,6 +18,14 @@ namespace NPVisualEditor_Example
         private void CreateNodeDataTree()
         {
             m_nodeDataTree = new NodeDataTree();
+
+            var kvData = new BlackboardKVData()
+            {
+                m_key = "hp",
+                m_theIntValue = 100,
+                m_compareType = CompareType.TInt
+            };
+            m_nodeDataTree.m_blackboardInitList.Add(kvData);
             
             var rootData = new RootData(ID);
             m_nodeDataTree.m_nodeDataDict[rootData.m_ID] = rootData;
@@ -25,7 +33,7 @@ namespace NPVisualEditor_Example
 
             var serviceData = new ServiceData(ID);
             serviceData.m_interval = 0.125f;
-            serviceData.m_delegateData.m_action = UpdateBlackboard;
+            serviceData.m_delegateData.SetDelegate(UpdateBlackboard);
             NodeDataUtils.AddChild(rootData, serviceData);
             m_nodeDataTree.m_nodeDataDict[serviceData.m_ID] = serviceData;
 
@@ -50,11 +58,11 @@ namespace NPVisualEditor_Example
             m_nodeDataTree.m_nodeDataDict[sequenceData1.m_ID] = sequenceData1;
 
             var actionData1 = new ActionData(ID);
-            actionData1.m_actionData.m_action = SetColor;
+            actionData1.m_actionData.SetDelegate(SetColor);
             m_nodeDataTree.m_nodeDataDict[actionData1.m_ID] = actionData1;
 
             var actionData2 = new ActionData(ID);
-            actionData2.m_actionData.m_multiFrameFunc = Move;
+            actionData2.m_actionData.SetDelegate(Move);
             m_nodeDataTree.m_nodeDataDict[actionData2.m_ID] = actionData2;
 
             NodeDataUtils.AddChildren(sequenceData1, actionData1, actionData2);
@@ -64,7 +72,7 @@ namespace NPVisualEditor_Example
             m_nodeDataTree.m_nodeDataDict[sequenceData2.m_ID] = sequenceData2;
 
             var actionData3 = new ActionData(ID);
-            actionData3.m_actionData.m_action = SetColor;
+            actionData3.m_actionData.SetDelegate(SetColor);
             m_nodeDataTree.m_nodeDataDict[actionData3.m_ID] = actionData3;
 
             var waitUtilStoppedData = new WaitUtilStoppedData(ID);

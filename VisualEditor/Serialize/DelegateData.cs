@@ -18,23 +18,47 @@ namespace NPSerialization
         public Func<Request, Result> m_multiFrameFunc2;
 
         [JsonIgnore]
-        public string m_actionName = string.Empty;
+        private string m_actionName = string.Empty;
         [JsonIgnore]
-        public string m_singleFrameFuncName = string.Empty;
+        private string m_singleFrameFuncName = string.Empty;
         [JsonIgnore]
-        public string m_multiFrameFuncName = string.Empty;
+        private string m_multiFrameFuncName = string.Empty;
         [JsonIgnore]
-        public string m_multiFrameFunc2Name = string.Empty;
+        private string m_multiFrameFunc2Name = string.Empty;
+
+        public void SetDelegate(Action action)
+        {
+            string delegateString = GetSerializeString(action);
+            m_actionName = delegateString;
+        }
+
+        public void SetDelegate(Func<bool> func)
+        {
+            string delegateString = GetSerializeString(func);
+            m_singleFrameFuncName = delegateString;
+        }
+
+        public void SetDelegate(Func<bool, Result> func)
+        {
+            string delegateString = GetSerializeString(func);
+            m_multiFrameFuncName = delegateString;
+        }
+
+        public void SetDelegate(Func<Request, Result> func)
+        {
+            string delegateString = GetSerializeString(func);
+            m_multiFrameFunc2Name = delegateString;
+        }
 
         public string ActionString
         {
             get
             {
-                return GetSerializeString(m_action);
+                return m_actionName;
             }
             set
             {
-                m_action = (Action)GetDelegate<Action>(value);
+                m_actionName = value;
             }
         }
 
@@ -42,11 +66,11 @@ namespace NPSerialization
         {
             get
             {
-                return GetSerializeString(m_singleFrameFunc);
+                return m_singleFrameFuncName;
             }
             set
             {
-                m_singleFrameFunc = (Func<bool>)GetDelegate<Func<bool>>(value);
+                m_singleFrameFuncName = value;
             }
         }
 
@@ -54,11 +78,11 @@ namespace NPSerialization
         {
             get
             {
-                return GetSerializeString(m_multiFrameFunc);
+                return m_multiFrameFuncName;
             }
             set
             {
-                m_multiFrameFunc = (Func<bool, Result>)GetDelegate<Func<bool, Result>>(value);
+                m_multiFrameFuncName = value;
             }
         }
 
@@ -66,12 +90,12 @@ namespace NPSerialization
         {
             get
             {
-                return GetSerializeString(m_multiFrameFunc2);
+                return m_multiFrameFunc2Name;
             }
             set
             {
 
-                m_multiFrameFunc2 = (Func<Request, Result>)GetDelegate<Func<Request, Result>>(value);
+                m_multiFrameFunc2Name = value;
             }
         }
 
@@ -110,7 +134,27 @@ namespace NPSerialization
             }
         }
 
-        private Delegate GetDelegate<T>(string value) where T : System.Delegate
+        public void CreateDelegate()
+        {
+            if (!string.IsNullOrEmpty(m_actionName))
+            {
+                m_action = GetDelegate<Action>(m_actionName);
+            }
+            else if (!string.IsNullOrEmpty(m_singleFrameFuncName))
+            {
+                m_singleFrameFunc = GetDelegate<Func<bool>>(m_singleFrameFuncName);
+            }
+            else if (!string.IsNullOrEmpty(m_multiFrameFuncName))
+            {
+                m_multiFrameFunc = GetDelegate<Func<bool, Result>>(m_multiFrameFuncName);
+            }
+            else if (!string.IsNullOrEmpty(m_multiFrameFunc2Name))
+            {
+                m_multiFrameFunc2 = GetDelegate<Func<Request, Result>>(m_multiFrameFunc2Name);
+            }
+        }
+
+        private T GetDelegate<T>(string value) where T : System.Delegate
         {
             if (string.IsNullOrEmpty(value))
             {
@@ -147,13 +191,7 @@ namespace NPSerialization
                     return null;
                 }
 
-                var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-
-                if (method == null)
-                {
-                    throw new ArgumentException($"Static method {methodName} not found in type {typeName}.");
-                }
-
+                var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance) ?? throw new ArgumentException($"Static method {methodName} not found in type {typeName}.");
                 if (!method.IsStatic)
                 {
                     object instance;
@@ -171,25 +209,24 @@ namespace NPSerialization
     
         public string GetMethodName()
         {
-            string funcName = string.Empty;
-            if (m_action != null)
+            if (!string.IsNullOrEmpty(m_actionName))
             {
-                funcName = GetSerializeString(m_action);
+                return m_actionName;
             }
-            else if (m_singleFrameFunc != null)
+            else if (!string.IsNullOrEmpty(m_singleFrameFuncName))
             {
-                funcName = GetSerializeString(m_singleFrameFunc);
+                return m_singleFrameFuncName;
             }
-            else if (m_multiFrameFunc != null)
+            else if (!string.IsNullOrEmpty(m_multiFrameFuncName))
             {
-                funcName = GetSerializeString(m_multiFrameFunc);
+                return m_multiFrameFuncName;
             }
-            else if (m_multiFrameFunc2 != null)
+            else if (!string.IsNullOrEmpty(m_multiFrameFunc2Name))
             {
-                funcName = GetSerializeString(m_multiFrameFunc2);
+                return m_multiFrameFunc2Name;
             }
 
-            return funcName;
+            return string.Empty;
         }
     
         public bool ResetMethod(string methodString)
@@ -226,13 +263,13 @@ namespace NPSerialization
                 if (parameterTypes.Length == 0)
                 {
                     Clear();
-                    ActionString = methodString;
+                    m_actionName = methodString;
                     return true;
                 }
                 else if (parameterTypes.Length == 1 && parameterTypes[0] == typeof(bool))
                 {
                     Clear();
-                    SingleFrameFuncString = methodString;
+                    m_singleFrameFuncName = methodString;
                     return true;
                 }
             }
@@ -241,13 +278,13 @@ namespace NPSerialization
                 if (parameterTypes.Length == 1 && parameterTypes[0] == typeof(bool))
                 {
                     Clear();
-                    MultiFrameFuncString = methodString;
+                    m_multiFrameFuncName = methodString;
                     return true;
                 }
                 else if (parameterTypes.Length == 1 && parameterTypes[0] == typeof(Request))
                 {
                     Clear();
-                    MultiFrameFunc2String = methodString;
+                    m_multiFrameFunc2Name = methodString;
                     return true;
                 }
             }
@@ -261,6 +298,16 @@ namespace NPSerialization
             m_singleFrameFunc = null;
             m_multiFrameFunc = null;
             m_multiFrameFunc2 = null;
+
+            m_actionName = string.Empty;
+            m_singleFrameFuncName = string.Empty;
+            m_multiFrameFuncName = string.Empty;
+            m_multiFrameFunc2Name = string.Empty;
+        }
+
+        public bool IsDelegateCreated()
+        {
+            return m_action != null || m_singleFrameFunc != null || m_multiFrameFunc != null || m_multiFrameFunc2 != null;
         }
     }
 }

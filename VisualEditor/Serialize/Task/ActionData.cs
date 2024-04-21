@@ -24,6 +24,9 @@ namespace NPSerialization
 
         public override Task CreateTask()
         {
+            if (!m_actionData.IsDelegateCreated())
+                m_actionData.CreateDelegate();
+
             if (m_actionData.m_action != null)
             {
                 m_action = new Action(m_actionData.m_action);

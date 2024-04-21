@@ -1,12 +1,13 @@
 ﻿using NPBehave;
 using System.Collections.Generic;
-using TMPro;
 
 namespace NPSerialization
 {
     public class NodeDataTree
     {
         public long m_rootID;
+
+        public List<BlackboardKVData> m_blackboardInitList = new();
 
         public Dictionary<long, NodeData> m_nodeDataDict = new();
 
@@ -71,6 +72,15 @@ namespace NPSerialization
                         current.CreateComposite(tmpNodes.ToArray());
                         break;
                 }
+            }
+        }
+
+        public virtual void InitBlackboard()
+        {
+            Blackboard blackboard = m_nodeDataDict[m_rootID].GetNode().Blackboard;
+            foreach (var kvData in m_blackboardInitList)
+            {
+                blackboard.Set(kvData.m_key, kvData.GetValue());
             }
         }
     }

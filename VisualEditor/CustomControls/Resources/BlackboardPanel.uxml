@@ -12,7 +12,7 @@
                 <ui:Label text="Variables" display-tooltip-when-elided="true" style="-unity-font-style: bold; -unity-text-align: middle-center;" />
                 <uie:ToolbarButton text="Delete" display-tooltip-when-elided="true" name="delete" />
             </uie:Toolbar>
-            <ui:ListView focusable="true" name="variables" fixed-item-height="20" style="height: 347px;" />
         </ui:VisualElement>
+        <ui:ListView focusable="true" name="variables" style="height: 346px;" />
     </ui:VisualElement>
 </ui:UXML>

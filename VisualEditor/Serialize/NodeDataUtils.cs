@@ -85,7 +85,7 @@ namespace NPSerialization
                     else if (typeof(ServiceData).FullName == nodeData.TYPE_NAME_FOR_SERIALIZATION)
                     {
                         var serviceData = nodeData as ServiceData;
-                        subTitle = serviceData.m_interval.ToString() + "," + serviceData.m_delegateData.m_action.Method.Name;
+                        subTitle = serviceData.m_interval.ToString() + "," + serviceData.m_delegateData.GetMethodName();
                     }
                     break;
                 case NodeType.Task:
