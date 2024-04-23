@@ -157,6 +157,7 @@ namespace NPVisualEditor
                 CreateNodeGraphByData(nodeDataTree);
                 m_tmpNodeDataTree = nodeDataTree;
             }
+            UpdateKVDatas();
         }
 
         private void DisplayTimedMessage(string message, HelpBoxMessageType type, float time)
@@ -340,7 +341,6 @@ namespace NPVisualEditor
 
             return maxID + 1;
         }
-
 
 
         public Dictionary<long, GraphNode> ID2GraphNode { get; private set; } = new();
