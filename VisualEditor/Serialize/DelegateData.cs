@@ -195,9 +195,33 @@ namespace NPSerialization
                 if (!method.IsStatic)
                 {
                     object instance;
-                    if (ID == 0 || !InstanceContext.Instance.TryGetReference(type, ID, out instance))
+                    if (ID == 0)
                     {
                         return null;
+                    }
+
+                    if (!InstanceContext.Instance.TryGetReference(type, ID, out instance))
+                    {
+                        if (typeof(T) == typeof(Action))
+                        {
+                            MethodInfo fakeMethodInfo = typeof(DelegateData).GetMethod(nameof(CheckAction));
+                            return (T)Delegate.CreateDelegate(typeof(T), this, fakeMethodInfo);
+                        }
+                        else if (typeof(T) == typeof(Func<bool>))
+                        {
+                            MethodInfo fakeMethodInfo = typeof(DelegateData).GetMethod(nameof(CheckSingleFrameFunc));
+                            return (T)Delegate.CreateDelegate(typeof(T), this, fakeMethodInfo);
+                        }
+                        else if (typeof(T) == typeof(Func<bool, Result>))
+                        {
+                            MethodInfo fakeMethodInfo = typeof(DelegateData).GetMethod(nameof(CheckMultiFrameFunc));
+                            return (T)Delegate.CreateDelegate(typeof(T), this, fakeMethodInfo);
+                        }
+                        else if (typeof(T) == typeof(Func<Request, Result>))
+                        {
+                            MethodInfo fakeMethodInfo = typeof(DelegateData).GetMethod(nameof(CheckMultiFrameFunc2));
+                            return (T)Delegate.CreateDelegate(typeof(T), this, fakeMethodInfo);
+                        }
                     }
 
                     return (T)Delegate.CreateDelegate(typeof(T), instance, method);
@@ -207,6 +231,86 @@ namespace NPSerialization
             }
         }
     
+        private void CheckAction()
+        {
+            if (m_action == null)
+            {
+                if (TryGetInstance(m_actionName, out object instance, out var method))
+                {
+                    m_action = (Action)Delegate.CreateDelegate(typeof(Action), instance, method);
+                    m_action.Invoke();
+                }
+            }
+            else
+            {
+                m_action.Invoke();
+            }
+        }
+
+        private bool CheckSingleFrameFunc()
+        {
+            if (m_singleFrameFunc == null)
+            {
+                if (TryGetInstance(m_singleFrameFuncName, out object instance, out var method))
+                {
+                    m_singleFrameFunc = (Func<bool>)Delegate.CreateDelegate(typeof(Func<bool>), instance, method);
+                    return m_singleFrameFunc.Invoke();
+                }
+                return false;
+            }
+            else
+            {
+                return m_singleFrameFunc.Invoke();
+            }
+        }
+
+        private Result CheckMultiFrameFunc(bool arg)
+        {
+            if (m_multiFrameFunc == null)
+            {
+                if (TryGetInstance(m_multiFrameFuncName, out object instance, out var method))
+                {
+                    m_multiFrameFunc = (Func<bool, Result>)Delegate.CreateDelegate(typeof(Func<bool, Result>), instance, method);
+                    return m_multiFrameFunc.Invoke(arg);
+                }
+                return Result.FAILED;
+            }
+            else
+            {
+                return m_multiFrameFunc.Invoke(arg);
+            }
+        }
+
+        private Result CheckMultiFrameFunc2(Request arg)
+        {
+            if (m_multiFrameFunc2 == null)
+            {
+                if (TryGetInstance(m_multiFrameFunc2Name, out object instance, out var method))
+                {
+                    m_multiFrameFunc2 = (Func<Request, Result>)Delegate.CreateDelegate(typeof(Func<Request, Result>), instance, method);
+                    return m_multiFrameFunc2.Invoke(arg);
+                }
+                return Result.FAILED;
+            }
+            else
+            {
+                return m_multiFrameFunc2.Invoke(arg);
+            }
+        }
+
+        private static bool TryGetInstance(string delegateString, out object instance, out MethodInfo method)
+        {
+            var parts = delegateString.Split('|');
+
+            long ID = Convert.ToInt64(parts[1]);
+            string methodName = parts[2];
+            string typeName = parts[0];
+            var type = typeName != null ? Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.FullName == typeName) : null;
+            method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance) ?? throw new ArgumentException($"Static method {methodName} not found in type {typeName}.");
+
+            return InstanceContext.Instance.TryGetReference(type, ID, out instance);
+        }
+
         public string GetMethodName()
         {
             if (!string.IsNullOrEmpty(m_actionName))

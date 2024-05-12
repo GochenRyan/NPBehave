@@ -182,10 +182,6 @@ namespace NPSerialization
             else
             {
                 Type type = methodInfo.ReflectedType;
-                ParameterInfo[] parameters = methodInfo.GetParameters();
-
-                if (parameters.Length == 0)
-                    return null;
 
                 long IDObject = 0;
 

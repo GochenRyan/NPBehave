@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 namespace NPVisualEditor_Example
 {
-    [SerializationID(1001)]
     public class VisualEditorExampleSerialize : MonoBehaviour
     {
         private void Start()

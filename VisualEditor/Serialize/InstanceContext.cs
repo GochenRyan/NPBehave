@@ -17,7 +17,6 @@ namespace NPSerialization
                 }
                 return instance;
             }
-
         }
 
         public bool RegisterReference(object obj, long id)

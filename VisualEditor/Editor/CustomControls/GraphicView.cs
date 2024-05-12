@@ -41,7 +41,8 @@ namespace NPVisualEditor
                                     Type nodeClsType = dropdownMenuAction.userData as Type;
                                     var instance = Activator.CreateInstance(nodeClsType) as NodeData;
 
-                                    var graphNode = CreateNode(dropdownMenuAction.eventInfo.mousePosition);
+                                    Vector2 localMousePosition = contentViewContainer.WorldToLocal(dropdownMenuAction.eventInfo.mousePosition);
+                                    var graphNode = CreateNode(localMousePosition);
                                     graphNode.title = nodeClsType.Name.Replace("Data", "");
                                     graphNode.Description = "";
                                     graphNode.SubTitle = NodeDataUtils.GetSubTitle(instance);

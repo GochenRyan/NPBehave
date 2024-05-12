@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Unity.VisualScripting.Metadata;
 
 namespace NPVisualEditor
 {
@@ -56,6 +57,7 @@ namespace NPVisualEditor
             NodeGraphicView = rootVisualElement.Q<GraphicView>("GraphicView");
             NodeGraphicView.ManualAddNode += OnManualAddNode;
             NodeGraphicView.ManualRemoveNodes += OnManualRemoveNodes;
+            NodeGraphicView.graphViewChanged += OnGraphViewChange;
 
             var openBtn = rootVisualElement.Q<Button>("open");
             openBtn.RegisterCallback<MouseUpEvent>((evt) => Open());
@@ -221,6 +223,55 @@ namespace NPVisualEditor
                     m_tmpNodeDataTree.m_nodeDataDict.Remove(node.Data.m_ID);
                 }
             }
+        }
+
+        private GraphViewChange OnGraphViewChange(GraphViewChange graphViewChange)
+        {
+            // Adjust execution order based on location
+            if (graphViewChange.movedElements != null && graphViewChange.movedElements.Count > 0)
+            {
+                foreach (var element in graphViewChange.movedElements)
+                {
+                    if (element is GraphNode node)
+                    {
+                        var parent = GraphicUtils.GetParent(node);
+                        
+                        if (parent != null)
+                        {
+                            NodeData parentData = parent.Data;
+                            var children = GraphicUtils.GetChildren(parent).ToList();
+                            children.Sort((a, b) => GraphicUtils.GetPosition(a).x.CompareTo(GraphicUtils.GetPosition(b).x));
+                            
+                            bool dirty = false;
+                            List<long> ids = new();
+                            List<Edge> newEdges = new();
+                            for (int i = 0; i < children.Count; ++i)
+                            {
+                                if (children[i].Data.m_ID != parentData.m_linkedNodeIDs[i])
+                                {
+                                    dirty = true;
+                                }
+                                ids.Add(children[i].Data.m_ID);
+                                newEdges.Add(children[i].Q<Port>("Parent").connections.First());
+                            }
+
+                            if (dirty)
+                            {
+
+                                NodeGraphicView.DeleteElements(newEdges);
+                                foreach(var child in children)
+                                {
+                                    NodeGraphicView.CreateEdge(parent.Q<Port>("Children"), child.Q<Port>("Parent"));
+                                }
+
+                                parentData.m_linkedNodeIDs = ids;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return graphViewChange;
         }
 
         private void OnManualAddNode(GraphNode node)
