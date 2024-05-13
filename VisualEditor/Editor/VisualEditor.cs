@@ -257,9 +257,9 @@ namespace NPVisualEditor
 
                             if (dirty)
                             {
-
+                                parent.Q<Port>("Children").DisconnectAll();
                                 NodeGraphicView.DeleteElements(newEdges);
-                                foreach(var child in children)
+                                foreach (var child in children)
                                 {
                                     NodeGraphicView.CreateEdge(parent.Q<Port>("Children"), child.Q<Port>("Parent"));
                                 }
@@ -334,10 +334,12 @@ namespace NPVisualEditor
 
             Queue<long> q = new();
             q.Enqueue(rootID);
+            Stack<long> ids = new();
 
             while (q.Count > 0)
             {
                 var id = q.Dequeue();
+                ids.Push(id);
                 var node = NodeGraphicView.CreateNode(nodeDataTree.m_nodeDataDict[id].m_position);
 
                 node.Data = nodeDataTree.m_nodeDataDict[id];
@@ -352,12 +354,15 @@ namespace NPVisualEditor
                 }
             }
 
-            foreach (var nodeData in nodeDataTree.m_nodeDataDict.Values)
+            foreach (var id in ids)
             {
-                long parentID = nodeData.m_parentID;
-                if (parentID != 0)
+                var childIDs = ID2GraphNode[id].Data.m_linkedNodeIDs;
+                if (childIDs.Count > 0)
                 {
-                    NodeGraphicView.CreateEdge(ID2GraphNode[parentID].Q<Port>("Children"), ID2GraphNode[nodeData.m_ID].Q<Port>("Parent"));
+                    foreach (long childID in childIDs)
+                    {
+                        NodeGraphicView.CreateEdge(ID2GraphNode[id].Q<Port>("Children"), ID2GraphNode[childID].Q<Port>("Parent"));
+                    }
                 }
             }
 
