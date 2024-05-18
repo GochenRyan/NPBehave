@@ -427,15 +427,14 @@ namespace NPVisualEditor
         private void SaveTmpData()
         {
             if (m_tmpNodeDataTree != null
-               && m_tmpNodeDataTree.m_nodeDataDict.Count > 0
-               && m_tmpNodeDataTree.m_blackboardInitList.Count > 0)
+               && (m_tmpNodeDataTree.m_nodeDataDict.Count > 0
+               || m_tmpNodeDataTree.m_blackboardInitList.Count > 0))
             {
                 string tmpPath = Path.Combine(Application.temporaryCachePath, "NodeTreeTmpData.json");
                 var jsonStream = new JsonStream();
                 jsonStream.Save(m_tmpNodeDataTree, tmpPath);
             }
         }
-
 
         public Dictionary<long, GraphNode> ID2GraphNode { get; private set; } = new();
         public VisualElement BlackboardPanel { get; private set; }
