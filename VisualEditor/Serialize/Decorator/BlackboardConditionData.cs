@@ -9,7 +9,7 @@ namespace NPSerialization
 
         public Operator m_operator;
         public Stops m_stopsOnChange;
-        public BlackboardKVData m_blackboardData;
+        public BlackboardKVData m_blackboardData = new();
 
         [JsonIgnore]
         public BlackboardCondition m_blackboardCondition;

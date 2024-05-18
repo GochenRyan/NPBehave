@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace NPVisualEditor_Example
 {
-    public class NPC : MonoBehaviour
+    public class NPC : MonoBehaviour, ISampleNPC
     {
         private void Start()
         {
@@ -15,12 +15,20 @@ namespace NPVisualEditor_Example
             switch (NPCModel.AnimState)
             {
                 case AnimState.IDLE:
+                    m_animator.SetBool("bAttack", false);
+                    m_animator.SetBool("bWalk", false);
+                    m_animator.SetBool("bDefend", false);
                     break;
                 case AnimState.WALK:
+                    m_animator.SetBool("bWalk", true);
+                    NPCModel.Position += NPCModel.Speed * Time.deltaTime;
+                    transform.position = NPCModel.Position;
                     break;
                 case AnimState.ATTACK:
+                    m_animator.SetBool("bAttack", true);
                     break;
-                case AnimState.DEFEND: 
+                case AnimState.DEFEND:
+                    m_animator.SetBool("bDefend", true);
                     break;
             }
         }

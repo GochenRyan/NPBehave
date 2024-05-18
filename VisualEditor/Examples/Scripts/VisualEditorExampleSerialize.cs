@@ -124,7 +124,7 @@ namespace NPVisualEditor_Example
             jsonStream.Load(path, out NodeDataTree nodeDataTree);
             nodeDataTree.CreateTreeByNodeData();
 
-            var rootData = nodeDataTree.m_nodeDataDict[m_nodeDataTree.m_rootID] as RootData;
+            var rootData = nodeDataTree.m_nodeDataDict[nodeDataTree.m_rootID] as RootData;
             rootData.GetNode().Start();
         }
 

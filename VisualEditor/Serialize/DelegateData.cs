@@ -370,7 +370,10 @@ namespace NPSerialization
                     m_actionName = methodString;
                     return true;
                 }
-                else if (parameterTypes.Length == 1 && parameterTypes[0] == typeof(bool))
+            }
+            else if (methodInfo.ReturnType == typeof(bool))
+            {
+                if (parameterTypes.Length == 0)
                 {
                     Clear();
                     m_singleFrameFuncName = methodString;

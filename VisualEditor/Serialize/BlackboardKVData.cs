@@ -4,9 +4,9 @@ namespace NPSerialization
 {
     public class BlackboardKVData
     {
-        public string m_key;
+        public string m_key = string.Empty;
         public CompareType m_compareType;
-        public string m_theStringValue;
+        public string m_theStringValue = string.Empty;
         public bool m_theBoolValue;
         public float m_theFloatValue;
         public int m_theIntValue;

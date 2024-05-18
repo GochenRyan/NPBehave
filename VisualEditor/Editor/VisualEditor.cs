@@ -380,7 +380,7 @@ namespace NPVisualEditor
                 long id = node.ID;
                 if (m_tmpNodeDataTree.m_nodeDataDict.TryGetValue(id, out NodeData nodeData))
                 {
-                    var elements = UIFactory.CreateElements(node, nodeData);
+                    var elements = UIFactory.CreateElements(node, nodeData, () => { OnSelectedNode(sender, args); });
                     foreach (var element in elements)
                     {
                         InspectorView.Add(element);

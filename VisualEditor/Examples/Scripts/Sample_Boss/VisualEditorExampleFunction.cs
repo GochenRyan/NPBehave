@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace NPVisualEditor_Example
 {
-
     public class VisualEditorFunction : MonoBehaviour
     {
         private void Start()
@@ -14,13 +13,10 @@ namespace NPVisualEditor_Example
 
         private void CreateNPC()
         {
-            NPCModel model1001 = new(1001, 100, 20);
-            NPCModel model1002 = new(1002, 100, 30);
-            Behavoir1001 behavoir1001 = new(model1001);
-            Behavoir1002 behavoir1002 = new(model1002);
+            NPCModel model = new(1001, 100, 20);
+            Boss boss = new(model);
 
-            InstanceContext.Instance.RegisterReference(behavoir1001, 1001);
-            InstanceContext.Instance.RegisterReference(behavoir1002, 1002);
+            InstanceContext.Instance.RegisterReference(boss, 1001);
         }
 
         private void LoadNodeDataTree()

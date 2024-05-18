@@ -5,6 +5,7 @@ namespace NPVisualEditor_Example
         WALK,
         IDLE,
         ATTACK,
-        DEFEND
+        DEFEND,
+        TACK_DAMAGE
     }
 }

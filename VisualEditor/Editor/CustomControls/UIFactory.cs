@@ -11,13 +11,13 @@ namespace NPVisualEditor
 {
     public static class UIFactory
     {
-        public static List<VisualElement> CreateElements(GraphNode node, object obj)
+        public static List<VisualElement> CreateElements(GraphNode node, object obj, Action updateSelf)
         {
             List<VisualElement> elements = new();
             foreach (FieldInfo info in obj.GetType().GetFields())
             {
                 bool read = IsRead(obj, info);
-                VisualElement element = CreateElement(node, obj, info, read);
+                VisualElement element = CreateElement(node, obj, info, read, updateSelf);
                 if (element != null)
                 {
                     elements.Add(element);
@@ -27,7 +27,7 @@ namespace NPVisualEditor
             return elements;
         }
 
-        public static VisualElement CreateElement(GraphNode node, object obj, FieldInfo fieldInfo, bool read)
+        public static VisualElement CreateElement(GraphNode node, object obj, FieldInfo fieldInfo, bool read, Action updateSelf)
         {
             VisualElement element = null;
 
@@ -204,6 +204,53 @@ namespace NPVisualEditor
                 }
                 element.Add(keyElem);
                 element.Add(valueElem);
+            }
+            else if (type == typeof(List<string>))
+            {
+                element = new VisualElement();
+                element.style.flexDirection = FlexDirection.Column;
+
+                var labelLabel = new Label(label);
+                element.Add(labelLabel);
+
+                var lst = (List<string>)fieldInfo.GetValue(obj);
+
+                var listView = new ListView();
+                listView.makeItem = () => new Label();
+                listView.bindItem = (e, i) => (e as Label).text = lst[i];
+                listView.itemsSource = lst;
+                listView.selectionType = SelectionType.Single;
+                listView.style.maxHeight = 200;
+                element.Add(listView);
+
+                var removeButton = new Button() { text = "Remove" };
+                removeButton.RegisterCallback<MouseUpEvent>((evt) => {
+                    string selectItem = (string)listView.selectedItem;
+                    if (!string.IsNullOrEmpty(selectItem))
+                    {
+                        lst.Remove(selectItem);
+                        updateSelf?.Invoke();
+                    }
+                });
+                element.Add(removeButton);
+
+                VisualElement subElem = new();
+                subElem.style.flexDirection = FlexDirection.Row;
+
+                var textElem = new TextField();
+                subElem.Add(textElem);
+
+                var addButton = new Button() { text = "Add" };
+                addButton.RegisterCallback<MouseUpEvent>((evt) => {
+                    if (!string.IsNullOrEmpty(textElem.value))
+                    {
+                        lst.Add(textElem.value);
+                        updateSelf?.Invoke();
+                    }
+                });
+                subElem.Add(addButton);
+
+                element.Add(subElem);
             }
 
             return element;
