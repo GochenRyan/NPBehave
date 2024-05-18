@@ -8,7 +8,6 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static Unity.VisualScripting.Metadata;
 
 namespace NPVisualEditor
 {
@@ -22,11 +21,6 @@ namespace NPVisualEditor
         {
             VisualEditor wnd = GetWindow<VisualEditor>();
             wnd.titleContent = new GUIContent("VisualEditor");
-        }
-
-        void OnDestroy()
-        {
-            // TODO: Check if data should be saved
         }
 
         public void CreateGUI()
@@ -78,6 +72,8 @@ namespace NPVisualEditor
 
             var deleteBtn = BlackboardPanel.Q<Button>("delete");
             deleteBtn.RegisterCallback<MouseUpEvent>((evt)=> DeleteBlackBoardItem());
+
+            OpenTmpData();
         }
 
         private void DeleteBlackBoardItem()
@@ -289,6 +285,11 @@ namespace NPVisualEditor
         private void Open()
         {
             string path = EditorUtility.OpenFilePanel("Select", Application.dataPath, "");
+            Open(path);
+        }
+
+        private void Open(string path)
+        {
             string extension = Path.GetExtension(path);
             rootVisualElement.Q<Label>("TreeName").text = Path.GetFileNameWithoutExtension(path);
             NodeDataTree nodeDataTree = null;
@@ -396,6 +397,43 @@ namespace NPVisualEditor
             long maxID = m_tmpNodeDataTree.m_nodeDataDict.Keys.Max();
 
             return maxID + 1;
+        }
+
+        private void OnEnable()
+        {
+            EditorApplication.quitting += OnEditorQutting;
+        }
+
+        private void OnDisable()
+        {
+            EditorApplication.quitting -= OnEditorQutting;
+            SaveTmpData();
+        }
+
+        private void OnEditorQutting()
+        {
+            SaveTmpData();
+        }
+
+        private void OpenTmpData()
+        {
+            string tmpPath = Path.Combine(Application.temporaryCachePath, "NodeTreeTmpData.json");
+            if (File.Exists(tmpPath))
+            {
+                Open(tmpPath);
+            }
+        }
+
+        private void SaveTmpData()
+        {
+            if (m_tmpNodeDataTree != null
+               && m_tmpNodeDataTree.m_nodeDataDict.Count > 0
+               && m_tmpNodeDataTree.m_blackboardInitList.Count > 0)
+            {
+                string tmpPath = Path.Combine(Application.temporaryCachePath, "NodeTreeTmpData.json");
+                var jsonStream = new JsonStream();
+                jsonStream.Save(m_tmpNodeDataTree, tmpPath);
+            }
         }
 
 
