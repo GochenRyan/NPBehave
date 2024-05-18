@@ -135,6 +135,9 @@ namespace NPVisualEditor
         public static GraphNode GetParent(GraphNode node)
         {
             Port port = node.Q<Port>("Parent");
+            if (port.connections.Count() == 0)
+                return null;
+
             var edge = port.connections.First();
             GraphNode connectedNode = edge.output.node as GraphNode;
             return connectedNode;
