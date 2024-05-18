@@ -1,14 +1,11 @@
 using NPBehave;
 using NPSerialization;
-using System.IO;
 using UnityEngine;
 
 namespace NPVisualEditor_Example
 {
-    public partial class Boss : ISampleNPC, IBehavoiral
+    public partial class FunctionsCase : IBehavoiral
     {
-        public NPCModel NPCModel { get; set; }
-
         public Root GetRoot()
         {
             return m_root;
@@ -17,7 +14,7 @@ namespace NPVisualEditor_Example
         public void LoadBehavoirNodes()
         {
             var jsonStream = new JsonStream();
-            string path = "sample_boss";
+            string path = "sample_functions";
             jsonStream.ReadLocator = (string _path) =>
             {
                 var textAsset = Resources.Load(_path) as TextAsset;
@@ -43,23 +40,6 @@ namespace NPVisualEditor_Example
 
         public void UpdateBlackBoard()
         {
-            m_blackboard["I_HP"] = m_npc.HP;
-            m_blackboard["I_POWER"] = m_npc.Power;
-
-            m_blackboard["B_NEAR_CHARACTER"] = false;
-            var characterGO = GameObject.FindGameObjectWithTag("CHARACTER");
-            if (characterGO != null)
-            {
-                var model = characterGO.GetComponent<NPCModel>();
-                if (model != m_npc)
-                {
-                    if (Vector3.Distance(model.Position, m_npc.Position) < 5)
-                    {
-                        m_blackboard["F_LAST_FOUND_CHARACTER"] = Time.time;
-                        m_blackboard["B_NEAR_CHARACTER"] = true;
-                    }
-                }
-            }
         }
 
         private Root m_root;

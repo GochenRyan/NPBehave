@@ -3,15 +3,15 @@ using UnityEngine;
 
 namespace NPVisualEditor_Example
 {
-    public class VisualEditorFunction : MonoBehaviour
+    public class VisualEditorExampleBoss : MonoBehaviour
     {
         private void Start()
         {
-            CreateNPC();
+            CreateBoss();
             LoadNodeDataTree();
         }
 
-        private void CreateNPC()
+        private void CreateBoss()
         {
             NPCModel model = new(1001, 100, 20);
             Boss boss = new(model);
